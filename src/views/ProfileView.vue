@@ -1,74 +1,95 @@
-<script setup>
-import { reactive } from 'vue'
-import { useMainStore } from '@/stores/main'
-import { mdiAccount, mdiMail, mdiAsterisk, mdiFormTextboxPassword, mdiGithub } from '@mdi/js'
+﻿<script setup>
+import { reactive, ref } from 'vue'
+import { useAuthStore } from '@/stores/auth'
+import { mdiAccount, mdiMail, mdiAsterisk, mdiFormTextboxPassword } from '@mdi/js'
 import SectionMain from '@/components/SectionMain.vue'
 import CardBox from '@/components/CardBox.vue'
 import BaseDivider from '@/components/BaseDivider.vue'
 import FormField from '@/components/FormField.vue'
 import FormControl from '@/components/FormControl.vue'
-import FormFilePicker from '@/components/FormFilePicker.vue'
 import BaseButton from '@/components/BaseButton.vue'
 import BaseButtons from '@/components/BaseButtons.vue'
 import UserCard from '@/components/UserCard.vue'
 import LayoutAuthenticated from '@/layouts/LayoutAuthenticated.vue'
 import SectionTitleLineWithButton from '@/components/SectionTitleLineWithButton.vue'
+import NotificationBar from '@/components/NotificationBar.vue'
+import api from '@/services/api'
 
-const mainStore = useMainStore()
+const authStore = useAuthStore()
 
 const profileForm = reactive({
-  name: mainStore.userName,
-  email: mainStore.userEmail,
+  nome: authStore.user?.Nome || '',
+  email: authStore.user?.Email || ''
 })
 
 const passwordForm = reactive({
-  password_current: '',
-  password: '',
-  password_confirmation: '',
+  senhaAtual: '',
+  novaSenha: '',
+  confirmarNovaSenha: ''
 })
 
-const submitProfile = () => {
-  mainStore.setUser(profileForm)
+const notification = ref({
+  show: false,
+  color: 'info',
+  message: ''
+})
+
+const salvarPerfil = async () => {
+  notification.value.show = false
+  try {
+    const { data } = await api.put('/perfil', profileForm)
+    // Atualiza o store de autenticação
+    authStore.updateUser({ Nome: profileForm.nome, Email: profileForm.email })
+    notification.value = { show: true, color: 'success', message: data.message || 'Perfil atualizado com sucesso!' }
+  } catch (error) {
+    notification.value = { show: true, color: 'danger', message: error.response?.data?.message || 'Erro ao atualizar perfil.' }
+  }
 }
 
-const submitPass = () => {
-  //
+const salvarSenha = async () => {
+  notification.value.show = false
+  if (passwordForm.novaSenha !== passwordForm.confirmarNovaSenha) {
+    notification.value = { show: true, color: 'danger', message: 'As senhas não conferem.' }
+    return
+  }
+  try {
+    const { data } = await api.put('/perfil/senha', passwordForm)
+    notification.value = { show: true, color: 'success', message: data.message || 'Senha alterada com sucesso!' }
+    // Limpar formulário de senha
+    Object.assign(passwordForm, { senhaAtual: '', novaSenha: '', confirmarNovaSenha: '' })
+  } catch (error) {
+    notification.value = { show: true, color: 'danger', message: error.response?.data?.message || 'Erro ao alterar senha.' }
+  }
 }
 </script>
 
 <template>
   <LayoutAuthenticated>
     <SectionMain>
-      <SectionTitleLineWithButton :icon="mdiAccount" title="Profile" main>
-        <BaseButton
-          href="https://github.com/justboil/admin-one-vue-tailwind"
-          target="_blank"
-          :icon="mdiGithub"
-          label="Star on GitHub"
-          color="contrast"
-          rounded-full
-          small
-        />
-      </SectionTitleLineWithButton>
+      <SectionTitleLineWithButton :icon="mdiAccount" title="Meu Perfil" main />
+
+      <NotificationBar
+        v-if="notification.show"
+        :color="notification.color"
+        @close="notification.show = false"
+      >
+        {{ notification.message }}
+      </NotificationBar>
 
       <UserCard class="mb-6" />
 
       <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        <CardBox is-form @submit.prevent="submitProfile">
-          <FormField label="Avatar" help="Max 500kb">
-            <FormFilePicker label="Upload" />
-          </FormField>
-
-          <FormField label="Name" help="Required. Your name">
+        <CardBox is-form @submit.prevent="salvarPerfil">
+          <FormField label="Nome" help="Obrigatório. Seu nome">
             <FormControl
-              v-model="profileForm.name"
+              v-model="profileForm.nome"
               :icon="mdiAccount"
               name="username"
               required
               autocomplete="username"
             />
           </FormField>
-          <FormField label="E-mail" help="Required. Your e-mail">
+          <FormField label="E-mail" help="Obrigatório. Seu e-mail">
             <FormControl
               v-model="profileForm.email"
               :icon="mdiMail"
@@ -81,16 +102,15 @@ const submitPass = () => {
 
           <template #footer>
             <BaseButtons>
-              <BaseButton color="info" type="submit" label="Submit" />
-              <BaseButton color="info" label="Options" outline />
+              <BaseButton color="info" type="submit" label="Salvar Alterações" />
             </BaseButtons>
           </template>
         </CardBox>
 
-        <CardBox is-form @submit.prevent="submitPass">
-          <FormField label="Current password" help="Required. Your current password">
+        <CardBox is-form @submit.prevent="salvarSenha">
+          <FormField label="Senha atual" help="Obrigatório. Sua senha atual">
             <FormControl
-              v-model="passwordForm.password_current"
+              v-model="passwordForm.senhaAtual"
               :icon="mdiAsterisk"
               name="password_current"
               type="password"
@@ -101,9 +121,9 @@ const submitPass = () => {
 
           <BaseDivider />
 
-          <FormField label="New password" help="Required. New password">
+          <FormField label="Nova senha" help="Obrigatório. Nova senha">
             <FormControl
-              v-model="passwordForm.password"
+              v-model="passwordForm.novaSenha"
               :icon="mdiFormTextboxPassword"
               name="password"
               type="password"
@@ -112,9 +132,9 @@ const submitPass = () => {
             />
           </FormField>
 
-          <FormField label="Confirm password" help="Required. New password one more time">
+          <FormField label="Confirmar senha" help="Obrigatório. Confirme a nova senha">
             <FormControl
-              v-model="passwordForm.password_confirmation"
+              v-model="passwordForm.confirmarNovaSenha"
               :icon="mdiFormTextboxPassword"
               name="password_confirmation"
               type="password"
@@ -125,8 +145,7 @@ const submitPass = () => {
 
           <template #footer>
             <BaseButtons>
-              <BaseButton type="submit" color="info" label="Submit" />
-              <BaseButton color="info" label="Options" outline />
+              <BaseButton type="submit" color="info" label="Mudar Senha" />
             </BaseButtons>
           </template>
         </CardBox>

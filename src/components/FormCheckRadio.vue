@@ -1,4 +1,4 @@
-<script setup>
+﻿<script setup>
 import { useDarkModeStore } from '@/stores/darkMode'
 import { computed } from 'vue'
 

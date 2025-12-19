@@ -1,4 +1,4 @@
-<script setup>
+﻿<script setup>
 import AsideMenuItem from '@/components/AsideMenuItem.vue'
 
 defineProps({

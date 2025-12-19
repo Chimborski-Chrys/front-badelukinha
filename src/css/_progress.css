@@ -1,4 +1,4 @@
-@layer base {
+﻿@layer base {
   progress {
     @apply h-3 overflow-hidden rounded-full;
   }

@@ -1,5 +1,5 @@
-<script setup>
-import { reactive } from 'vue'
+﻿<script setup>
+import { reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { mdiAccount, mdiAsterisk } from '@mdi/js'
 import SectionFullScreen from '@/components/SectionFullScreen.vue'
@@ -10,17 +10,43 @@ import FormControl from '@/components/FormControl.vue'
 import BaseButton from '@/components/BaseButton.vue'
 import BaseButtons from '@/components/BaseButtons.vue'
 import LayoutGuest from '@/layouts/LayoutGuest.vue'
+import NotificationBar from '@/components/NotificationBar.vue'
+import { useAuthStore } from '@/stores/auth'
+import api from '@/services/api'
 
 const form = reactive({
-  login: 'john.doe',
-  pass: 'highly-secure-password-fYjUw-',
+  email: 'costureira1@email.com', // Valor de exemplo
+  senha: 'password123', // Valor de exemplo
   remember: true,
 })
 
 const router = useRouter()
+const authStore = useAuthStore()
 
-const submit = () => {
-  router.push('/dashboard')
+const errorMessage = ref(null)
+
+const submit = async () => {
+  errorMessage.value = null // Limpa erros anteriores
+  try {
+    const response = await api.post('/Auth/login', {
+      email: form.email,
+      senha: form.senha,
+    })
+
+    const { token, usuario } = response.data
+    authStore.setAuth(usuario, token)
+
+    // Redirecionamento condicional
+    if (authStore.isSuperAdmin) {
+      router.push('/admin/criar-costureira') // Nova rota para o super admin
+    } else {
+      router.push('/admin/dashboard') // Rota normal para costureiras
+    }
+  } catch (error) {
+    console.error('Falha no login:', error)
+    errorMessage.value = 'Email ou senha invÃ¡lidos. Por favor, tente novamente.'
+    authStore.clearAuth() // Garante que qualquer estado de auth antigo seja limpo
+  }
 }
 </script>
 
@@ -28,18 +54,22 @@ const submit = () => {
   <LayoutGuest>
     <SectionFullScreen v-slot="{ cardClass }" bg="purplePink">
       <CardBox :class="cardClass" is-form @submit.prevent="submit">
-        <FormField label="Login" help="Please enter your login">
+        <NotificationBar v-if="errorMessage" color="danger" :icon="mdiAlertCircle">
+          {{ errorMessage }}
+        </NotificationBar>
+
+        <FormField label="Email" help="Por favor, insira seu email">
           <FormControl
-            v-model="form.login"
+            v-model="form.email"
             :icon="mdiAccount"
             name="login"
             autocomplete="username"
           />
         </FormField>
 
-        <FormField label="Password" help="Please enter your password">
+        <FormField label="Senha" help="Por favor, insira sua senha">
           <FormControl
-            v-model="form.pass"
+            v-model="form.senha"
             :icon="mdiAsterisk"
             type="password"
             name="password"
@@ -50,14 +80,14 @@ const submit = () => {
         <FormCheckRadio
           v-model="form.remember"
           name="remember"
-          label="Remember"
+          label="Lembrar-me"
           :input-value="true"
         />
 
         <template #footer>
           <BaseButtons>
             <BaseButton type="submit" color="info" label="Login" />
-            <BaseButton to="/dashboard" color="info" outline label="Back" />
+            <BaseButton to="/" color="info" outline label="Voltar" />
           </BaseButtons>
         </template>
       </CardBox>

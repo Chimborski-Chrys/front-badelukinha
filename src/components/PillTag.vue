@@ -1,4 +1,4 @@
-<script setup>
+﻿<script setup>
 import { computed } from 'vue'
 import { colorsBgLight, colorsOutline } from '@/colors.js'
 import PillTagPlain from '@/components/PillTagPlain.vue'

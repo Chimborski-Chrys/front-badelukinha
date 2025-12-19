@@ -1,4 +1,4 @@
-<script setup>
+﻿<script setup>
 import { computed } from 'vue'
 import { useDarkModeStore } from '@/stores/darkMode.js'
 import { gradientBgPurplePink, gradientBgDark, gradientBgPinkRed } from '@/colors.js'

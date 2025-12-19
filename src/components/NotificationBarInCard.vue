@@ -1,4 +1,4 @@
-<script setup>
+﻿<script setup>
 import { colorsBgLight } from '@/colors.js'
 import { useDarkModeStore } from '@/stores/darkMode'
 

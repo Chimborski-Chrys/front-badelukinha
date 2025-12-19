@@ -1,4 +1,4 @@
-<script setup>
+﻿<script setup>
 import { computed, ref, onMounted, onBeforeUnmount } from 'vue'
 import { useMainStore } from '@/stores/main'
 import FormControlIcon from '@/components/FormControlIcon.vue'
@@ -132,7 +132,7 @@ if (props.ctrlKFocus) {
       :name="name"
       :class="inputElClass"
     >
-      <option v-for="option in options" :key="option.id ?? option" :value="option">
+      <option v-for="option in options" :key="option.id ?? option" :value="option.id ?? option">
         {{ option.label ?? option }}
       </option>
     </select>

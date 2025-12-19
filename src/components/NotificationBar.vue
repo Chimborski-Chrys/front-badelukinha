@@ -1,4 +1,4 @@
-<script setup>
+﻿<script setup>
 import { ref, computed, useSlots } from 'vue'
 import { mdiClose } from '@mdi/js'
 import { colorsBgLight, colorsOutline } from '@/colors.js'

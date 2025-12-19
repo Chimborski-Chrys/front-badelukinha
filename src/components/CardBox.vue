@@ -1,4 +1,4 @@
-<script setup>
+﻿<script setup>
 import { computed, useSlots } from 'vue'
 import CardBoxComponentBody from '@/components/CardBoxComponentBody.vue'
 import CardBoxComponentFooter from '@/components/CardBoxComponentFooter.vue'

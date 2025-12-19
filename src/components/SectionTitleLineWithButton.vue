@@ -1,4 +1,4 @@
-<script setup>
+﻿<script setup>
 import { mdiCog } from '@mdi/js'
 import { useSlots, computed } from 'vue'
 import BaseIcon from '@/components/BaseIcon.vue'

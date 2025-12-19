@@ -1,4 +1,4 @@
-@theme {
+﻿@theme {
   --scrollbar-track-basic: var(--color-gray-900);
   --scrollbar-thumb-basic: var(--color-gray-600);
   --scrollbar-basic: var(--scrollbar-thumb-basic) var(--scrollbar-track-basic);

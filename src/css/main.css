@@ -1,4 +1,4 @@
-@import 'tailwindcss';
+﻿@import 'tailwindcss';
 @plugin '@tailwindcss/forms';
 
 @source inline('style-{basic,white}');

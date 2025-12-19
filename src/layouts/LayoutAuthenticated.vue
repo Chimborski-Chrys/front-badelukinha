@@ -1,9 +1,11 @@
-<script setup>
+﻿<script setup>
 import { mdiForwardburger, mdiBackburger, mdiMenu } from '@mdi/js'
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import menuAside from '@/menuAside.js'
 import menuNavBar from '@/menuNavBar.js'
+import { useAuthStore } from '@/stores/auth.js'
+import { useMainStore } from '@/stores/main.js'
 import { useDarkModeStore } from '@/stores/darkMode.js'
 import BaseIcon from '@/components/BaseIcon.vue'
 import FormControl from '@/components/FormControl.vue'
@@ -15,11 +17,16 @@ import FooterBar from '@/components/FooterBar.vue'
 const layoutAsidePadding = 'xl:pl-60'
 
 const darkModeStore = useDarkModeStore()
-
+const authStore = useAuthStore()
+const mainStore = useMainStore()
 const router = useRouter()
 
 const isAsideMobileExpanded = ref(false)
 const isAsideLgActive = ref(false)
+
+onMounted(() => {
+  authStore.initializeAuth() // Garante que o usuário do localStorage seja carregado
+})
 
 router.beforeEach(() => {
   isAsideMobileExpanded.value = false
@@ -32,7 +39,8 @@ const menuClick = (event, item) => {
   }
 
   if (item.isLogout) {
-    //
+    authStore.clearAuth()
+    router.push('/login')
   }
 }
 </script>
@@ -40,7 +48,7 @@ const menuClick = (event, item) => {
 <template>
   <div
     :class="{
-      'overflow-hidden lg:overflow-visible': isAsideMobileExpanded,
+      'overflow-hidden lg:overflow-visible': isAsideMobileExpanded
     }"
   >
     <div
@@ -61,9 +69,6 @@ const menuClick = (event, item) => {
         <NavBarItemPlain display="hidden lg:flex xl:hidden" @click.prevent="isAsideLgActive = true">
           <BaseIcon :path="mdiMenu" size="24" />
         </NavBarItemPlain>
-        <NavBarItemPlain use-margin>
-          <FormControl placeholder="Search (ctrl+k)" ctrl-k-focus transparent borderless />
-        </NavBarItemPlain>
       </NavBar>
       <AsideMenu
         :is-aside-mobile-expanded="isAsideMobileExpanded"
@@ -73,12 +78,6 @@ const menuClick = (event, item) => {
         @aside-lg-close-click="isAsideLgActive = false"
       />
       <slot />
-      <FooterBar>
-        Get more with
-        <a href="https://tailwind-vue.justboil.me/" target="_blank" class="text-blue-600"
-          >Premium version</a
-        >
-      </FooterBar>
     </div>
   </div>
 </template>

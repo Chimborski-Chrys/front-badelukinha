@@ -1,4 +1,4 @@
-@utility dark-scrollbars-compat {
+﻿@utility dark-scrollbars-compat {
   scrollbar-color: var(--color-slate-600) var(--color-slate-800);
 }
 

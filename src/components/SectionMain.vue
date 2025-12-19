@@ -1,4 +1,4 @@
-<script setup>
+﻿<script setup>
 import { containerMaxW } from '@/config.js'
 </script>
 

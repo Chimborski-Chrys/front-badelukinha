@@ -1,4 +1,4 @@
-export const chartColors = {
+﻿export const chartColors = {
   default: {
     primary: '#00D1B2',
     info: '#209CEE',

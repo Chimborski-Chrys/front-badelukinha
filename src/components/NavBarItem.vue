@@ -1,4 +1,4 @@
-<script setup>
+﻿<script setup>
 import { mdiChevronUp, mdiChevronDown } from '@mdi/js'
 import { RouterLink } from 'vue-router'
 import { computed, ref, onMounted, onBeforeUnmount } from 'vue'
@@ -115,7 +115,7 @@ const darkModeStore = useDarkModeStore()
       <span
         class="px-2"
         :class="{
-          'lg:hidden': item.isDesktopNoLabel && item.icon,
+          'lg:hidden': item.isDesktopNoLabel && item.icon && !item.isCurrentUser,
           'transition-colors': !darkModeStore.isInProgress,
         }"
         >{{ itemLabel }}</span

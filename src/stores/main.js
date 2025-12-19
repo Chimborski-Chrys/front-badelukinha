@@ -1,32 +1,29 @@
-import { defineStore } from 'pinia'
+﻿import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import axios from 'axios'
+import { useAuthStore } from '@/stores/auth'
 
 export const useMainStore = defineStore('main', () => {
-  const userName = ref('John Doe')
-  const userEmail = ref('doe.doe.doe@example.com')
+  const authStore = useAuthStore()
 
-  const userAvatar = computed(
-    () =>
-      `https://api.dicebear.com/7.x/avataaars/svg?seed=${userEmail.value.replace(
-        /[^a-z0-9]+/gi,
-        '-',
-      )}`,
-  )
+  const userName = computed(() => authStore.user?.nome || '')
+  const userEmail = computed(() => authStore.user?.email || '')
+
+  const userAvatar = computed(() => {
+    if (authStore.user?.LogoUrl) {
+      return authStore.user.LogoUrl
+    }
+    // Use the new computed userEmail
+    return `https://api.dicebear.com/7.x/avataaars/svg?seed=${userEmail.value.replace(
+      /[^a-z0-9]+/gi,
+      '-',
+    )}`
+  })
 
   const isFieldFocusRegistered = ref(false)
 
   const clients = ref([])
   const history = ref([])
-
-  function setUser(payload) {
-    if (payload.name) {
-      userName.value = payload.name
-    }
-    if (payload.email) {
-      userEmail.value = payload.email
-    }
-  }
 
   function fetchSampleClients() {
     axios
@@ -57,7 +54,6 @@ export const useMainStore = defineStore('main', () => {
     isFieldFocusRegistered,
     clients,
     history,
-    setUser,
     fetchSampleClients,
     fetchSampleHistory,
   }

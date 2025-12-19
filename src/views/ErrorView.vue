@@ -1,4 +1,4 @@
-<script setup>
+﻿<script setup>
 import SectionFullScreen from '@/components/SectionFullScreen.vue'
 import CardBox from '@/components/CardBox.vue'
 import BaseButton from '@/components/BaseButton.vue'

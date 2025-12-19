@@ -1,4 +1,4 @@
-<script setup>
+﻿<script setup>
 import { computed } from 'vue'
 import { RouterLink } from 'vue-router'
 import { getButtonColor } from '@/colors.js'
