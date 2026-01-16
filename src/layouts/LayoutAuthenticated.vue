@@ -1,6 +1,6 @@
 ﻿<script setup>
 import { mdiForwardburger, mdiBackburger, mdiMenu } from '@mdi/js'
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import menuAside from '@/menuAside.js'
 import menuNavBar from '@/menuNavBar.js'
@@ -27,6 +27,17 @@ const isAsideLgActive = ref(false)
 onMounted(() => {
   authStore.initializeAuth() // Garante que o usuário do localStorage seja carregado
 })
+
+const dynamicMenuAside = computed(() => {
+  const menu = JSON.parse(JSON.stringify(menuAside)); // Deep copy
+  const vitrineItem = menu.find(item => item.label === 'Vitrine');
+  
+  if (vitrineItem && authStore.isAuthenticated && authStore.user?.id) {
+    vitrineItem.to = '/loja/' + authStore.user.id;
+  }
+  
+  return menu;
+});
 
 router.beforeEach(() => {
   isAsideMobileExpanded.value = false
@@ -73,7 +84,7 @@ const menuClick = (event, item) => {
       <AsideMenu
         :is-aside-mobile-expanded="isAsideMobileExpanded"
         :is-aside-lg-active="isAsideLgActive"
-        :menu="menuAside"
+        :menu="dynamicMenuAside"
         @menu-click="menuClick"
         @aside-lg-close-click="isAsideLgActive = false"
       />

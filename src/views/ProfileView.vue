@@ -1,5 +1,5 @@
 ﻿<script setup>
-import { reactive, ref } from 'vue'
+import { reactive, ref, watch } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { mdiAccount, mdiMail, mdiAsterisk, mdiFormTextboxPassword } from '@mdi/js'
 import SectionMain from '@/components/SectionMain.vue'
@@ -18,9 +18,17 @@ import api from '@/services/api'
 const authStore = useAuthStore()
 
 const profileForm = reactive({
-  nome: authStore.user?.Nome || '',
-  email: authStore.user?.Email || ''
+  nome: '',
+  email: ''
 })
+
+// Observa o usuário do store e preenche o formulário quando o usuário estiver disponível.
+watch(() => authStore.user, (newUser) => {
+  if (newUser) {
+    profileForm.nome = newUser.nome || ''
+    profileForm.email = newUser.email || ''
+  }
+}, { immediate: true })
 
 const passwordForm = reactive({
   senhaAtual: '',
@@ -38,8 +46,8 @@ const salvarPerfil = async () => {
   notification.value.show = false
   try {
     const { data } = await api.put('/perfil', profileForm)
-    // Atualiza o store de autenticação
-    authStore.updateUser({ Nome: profileForm.nome, Email: profileForm.email })
+    // Atualiza o store de autenticação com a mesma capitalização
+    authStore.updateUser({ nome: profileForm.nome, email: profileForm.email })
     notification.value = { show: true, color: 'success', message: data.message || 'Perfil atualizado com sucesso!' }
   } catch (error) {
     notification.value = { show: true, color: 'danger', message: error.response?.data?.message || 'Erro ao atualizar perfil.' }
