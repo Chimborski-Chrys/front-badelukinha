@@ -2,7 +2,7 @@
 import { mdiChevronUp, mdiChevronDown } from '@mdi/js'
 import { RouterLink } from 'vue-router'
 import { computed, ref, onMounted, onBeforeUnmount } from 'vue'
-import { useMainStore } from '@/stores/main.js'
+import { useAuthStore } from '@/stores/auth' // Changed from useMainStore
 import BaseIcon from '@/components/BaseIcon.vue'
 import UserAvatarCurrentUser from '@/components/UserAvatarCurrentUser.vue'
 import NavBarMenuList from '@/components/NavBarMenuList.vue'
@@ -45,8 +45,9 @@ const componentClass = computed(() => {
   return base
 })
 
-const itemLabel = computed(() =>
-  props.item.isCurrentUser ? useMainStore().userName : props.item.label,
+const authStore = useAuthStore() // Get authStore instance
+const itemLabel = computed(
+  () => (props.item.isCurrentUser ? authStore.user?.nome : props.item.label), // Use authStore.user.nome
 )
 
 const isDropdownActive = ref(false)
@@ -106,7 +107,12 @@ const darkModeStore = useDarkModeStore()
           item.menu,
       }"
     >
-      <UserAvatarCurrentUser v-if="item.isCurrentUser" class="mr-3 inline-flex h-6 w-6" />
+      <UserAvatarCurrentUser
+        v-if="item.isCurrentUser"
+        class="mr-3 inline-flex h-6 w-6"
+        :width="25"
+        :height="25"
+      />
       <BaseIcon
         v-if="item.icon"
         :path="item.icon"

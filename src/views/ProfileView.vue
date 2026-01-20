@@ -42,15 +42,54 @@ const notification = ref({
   message: ''
 })
 
+const isUploadingPhoto = ref(false)
+
+const handleFileSelected = async (file) => {
+  notification.value.show = false
+  isUploadingPhoto.value = true
+  const formData = new FormData()
+  formData.append('file', file)
+
+  try {
+    const { data } = await api.post('/perfil/foto-perfil', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    })
+    authStore.updateUser({ fotoPerfilUrl: data.fotoPerfilUrl })
+    notification.value = {
+      show: true,
+      color: 'success',
+      message: 'Foto de perfil atualizada com sucesso!'
+    }
+  } catch (error) {
+    notification.value = {
+      show: true,
+      color: 'danger',
+      message: error.response?.data?.message || 'Erro ao atualizar a foto de perfil.'
+    }
+  } finally {
+    isUploadingPhoto.value = false
+  }
+}
+
 const salvarPerfil = async () => {
   notification.value.show = false
   try {
     const { data } = await api.put('/perfil', profileForm)
     // Atualiza o store de autenticação com a mesma capitalização
     authStore.updateUser({ nome: profileForm.nome, email: profileForm.email })
-    notification.value = { show: true, color: 'success', message: data.message || 'Perfil atualizado com sucesso!' }
+    notification.value = {
+      show: true,
+      color: 'success',
+      message: data.message || 'Perfil atualizado com sucesso!'
+    }
   } catch (error) {
-    notification.value = { show: true, color: 'danger', message: error.response?.data?.message || 'Erro ao atualizar perfil.' }
+    notification.value = {
+      show: true,
+      color: 'danger',
+      message: error.response?.data?.message || 'Erro ao atualizar perfil.'
+    }
   }
 }
 
@@ -62,11 +101,19 @@ const salvarSenha = async () => {
   }
   try {
     const { data } = await api.put('/perfil/senha', passwordForm)
-    notification.value = { show: true, color: 'success', message: data.message || 'Senha alterada com sucesso!' }
+    notification.value = {
+      show: true,
+      color: 'success',
+      message: data.message || 'Senha alterada com sucesso!'
+    }
     // Limpar formulário de senha
     Object.assign(passwordForm, { senhaAtual: '', novaSenha: '', confirmarNovaSenha: '' })
   } catch (error) {
-    notification.value = { show: true, color: 'danger', message: error.response?.data?.message || 'Erro ao alterar senha.' }
+    notification.value = {
+      show: true,
+      color: 'danger',
+      message: error.response?.data?.message || 'Erro ao alterar senha.'
+    }
   }
 }
 </script>
@@ -84,7 +131,11 @@ const salvarSenha = async () => {
         {{ notification.message }}
       </NotificationBar>
 
-      <UserCard class="mb-6" />
+      <UserCard
+        class="mb-6"
+        :loading="isUploadingPhoto"
+        @file-selected="handleFileSelected"
+      />
 
       <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <CardBox is-form @submit.prevent="salvarPerfil">
