@@ -25,7 +25,7 @@ const selectedProduct = ref(null)
 const openModal = async (produto) => {
   selectedProduct.value = produto
   isModalOpen.value = true
-  
+
   // Verifica se jÃ¡ registrou clique neste produto nesta sessÃ£o
   const sessionKey = `viewed_product_${produto.id}`
   if (sessionStorage.getItem(sessionKey)) {

@@ -18,13 +18,13 @@ const form = reactive({
   email: '',
   senha: '',
   telefoneWhatsApp: '',
-  nomeMarca: ''
+  nomeMarca: '',
 })
 
 const notification = ref({
   show: false,
   color: 'info',
-  message: ''
+  message: '',
 })
 
 const submit = async () => {
@@ -34,7 +34,7 @@ const submit = async () => {
     notification.value = {
       show: true,
       color: 'success',
-      message: 'Costureira criada com sucesso!'
+      message: 'Costureira criada com sucesso!',
     }
     // Limpar formulário
     Object.assign(form, { nome: '', email: '', senha: '', telefoneWhatsApp: '', nomeMarca: '' })
@@ -43,7 +43,7 @@ const submit = async () => {
     notification.value = {
       show: true,
       color: 'danger',
-      message: error.response?.data?.message || 'Erro ao criar costureira.'
+      message: error.response?.data?.message || 'Erro ao criar costureira.',
     }
   }
 }
@@ -70,13 +70,18 @@ const submit = async () => {
         <FormField label="Email">
           <FormControl v-model="form.email" :icon="mdiAt" type="email" name="email" required />
         </FormField>
-        
+
         <FormField label="Senha Provisória">
           <FormControl v-model="form.senha" :icon="mdiLock" type="password" name="senha" required />
         </FormField>
 
         <FormField label="Telefone (WhatsApp)">
-          <FormControl v-model="form.telefoneWhatsApp" :icon="mdiWhatsapp" name="telefone" required />
+          <FormControl
+            v-model="form.telefoneWhatsApp"
+            :icon="mdiWhatsapp"
+            name="telefone"
+            required
+          />
         </FormField>
 
         <FormField label="Nome da Marca/Ateliê">

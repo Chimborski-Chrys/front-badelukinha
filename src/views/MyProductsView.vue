@@ -23,7 +23,7 @@ const categories = [
   { id: 'fantasia', label: 'Fantasias' },
   { id: 'conjunto-casual', label: 'Conjuntos Casuais' },
   { id: 'conserto', label: 'Consertos e Ajustes' },
-  { id: 'outros', label: 'Outros' }
+  { id: 'outros', label: 'Outros' },
 ]
 
 const defaultProduct = {
@@ -32,7 +32,7 @@ const defaultProduct = {
   descricao: '',
   categoria: 'vestido',
   precoMedio: 0,
-  imagemUrl: ''
+  imagemUrl: '',
 }
 
 const currentProduct = ref({ ...defaultProduct })
@@ -72,7 +72,7 @@ const submitProduct = async () => {
       descricao: currentProduct.value.descricao,
       categoria: currentProduct.value.categoria,
       precoMedio: parseFloat(currentProduct.value.precoMedio),
-      imagemUrl: currentProduct.value.imagemUrl
+      imagemUrl: currentProduct.value.imagemUrl,
     }
 
     if (currentProduct.value.id) {
@@ -80,7 +80,7 @@ const submitProduct = async () => {
     } else {
       await api.post('/produtos', payload)
     }
-    
+
     isModalActive.value = false
     await fetchProducts()
   } catch (error) {
@@ -122,9 +122,7 @@ onMounted(() => {
       </SectionTitleLineWithButton>
 
       <CardBox class="mb-6" has-table>
-        <div v-if="isLoading" class="p-4 text-center text-gray-500">
-          Carregando...
-        </div>
+        <div v-if="isLoading" class="p-4 text-center text-gray-500">Carregando...</div>
         <div v-else-if="products.length === 0" class="p-4 text-center text-gray-500">
           Você ainda não tem produtos cadastrados.
         </div>
@@ -140,9 +138,15 @@ onMounted(() => {
           </thead>
           <tbody>
             <tr v-for="product in products" :key="product.id">
-              <td class="border-b-0 lg:w-6 before:hidden">
-                <div class="w-24 h-24 mx-auto lg:w-12 lg:h-12 overflow-hidden rounded-full border border-gray-200">
-                  <img :src="product.imagemUrl || 'https://via.placeholder.com/150'" :alt="product.nome" class="w-full h-full object-cover">
+              <td class="border-b-0 before:hidden lg:w-6">
+                <div
+                  class="mx-auto h-24 w-24 overflow-hidden rounded-full border border-gray-200 lg:h-12 lg:w-12"
+                >
+                  <img
+                    :src="product.imagemUrl || 'https://via.placeholder.com/150'"
+                    :alt="product.nome"
+                    class="h-full w-full object-cover"
+                  />
                 </div>
               </td>
               <td data-label="Nome">
@@ -151,17 +155,10 @@ onMounted(() => {
               <td data-label="Categoria">
                 {{ product.categoria }}
               </td>
-              <td data-label="Preço">
-                R$ {{ product.precoMedio.toFixed(2) }}
-              </td>
-              <td class="before:hidden lg:w-1 whitespace-nowrap">
+              <td data-label="Preço">R$ {{ product.precoMedio.toFixed(2) }}</td>
+              <td class="whitespace-nowrap before:hidden lg:w-1">
                 <BaseButtons type="justify-start lg:justify-end" no-wrap>
-                  <BaseButton
-                    color="info"
-                    :icon="mdiPencil"
-                    small
-                    @click="openModal(product)"
-                  />
+                  <BaseButton color="info" :icon="mdiPencil" small @click="openModal(product)" />
                   <BaseButton
                     color="danger"
                     :icon="mdiTrashCan"
@@ -190,15 +187,15 @@ onMounted(() => {
       </FormField>
 
       <FormField label="Descrição">
-        <FormControl v-model="currentProduct.descricao" type="textarea" placeholder="Descreva o produto..." />
+        <FormControl
+          v-model="currentProduct.descricao"
+          type="textarea"
+          placeholder="Descreva o produto..."
+        />
       </FormField>
 
       <FormField label="Categoria">
-        <FormControl
-          v-model="currentProduct.categoria"
-          type="select"
-          :options="categories"
-        />
+        <FormControl v-model="currentProduct.categoria" type="select" :options="categories" />
       </FormField>
 
       <FormField label="Preço Médio (R$)">
@@ -219,7 +216,10 @@ onMounted(() => {
       has-cancel
       @confirm="deleteProduct"
     >
-      <p>Tem certeza que deseja excluir o produto <b>{{ productToDelete?.nome }}</b>?</p>
+      <p>
+        Tem certeza que deseja excluir o produto <b>{{ productToDelete?.nome }}</b
+        >?
+      </p>
       <p>Esta ação não pode ser desfeita.</p>
     </CardBoxModal>
   </LayoutAuthenticated>

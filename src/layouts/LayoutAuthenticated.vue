@@ -29,15 +29,15 @@ onMounted(() => {
 })
 
 const dynamicMenuAside = computed(() => {
-  const menu = JSON.parse(JSON.stringify(menuAside)); // Deep copy
-  const vitrineItem = menu.find(item => item.label === 'Vitrine');
-  
+  const menu = JSON.parse(JSON.stringify(menuAside)) // Deep copy
+  const vitrineItem = menu.find((item) => item.label === 'Vitrine')
+
   if (vitrineItem && authStore.isAuthenticated && authStore.user?.id) {
-    vitrineItem.to = '/loja/' + authStore.user.id;
+    vitrineItem.to = '/loja/' + authStore.user.id
   }
-  
-  return menu;
-});
+
+  return menu
+})
 
 router.beforeEach(() => {
   isAsideMobileExpanded.value = false
@@ -59,7 +59,7 @@ const menuClick = (event, item) => {
 <template>
   <div
     :class="{
-      'overflow-hidden lg:overflow-visible': isAsideMobileExpanded
+      'overflow-hidden lg:overflow-visible': isAsideMobileExpanded,
     }"
   >
     <div

@@ -7,20 +7,20 @@ const authStore = useAuthStore()
 const props = defineProps({
   canChangePhoto: {
     type: Boolean,
-    default: false
+    default: false,
   },
   loading: {
     type: Boolean,
-    default: false
+    default: false,
   },
   width: {
     type: Number,
-    default: 150
+    default: 150,
   },
   height: {
     type: Number,
-    default: 150
-  }
+    default: 150,
+  },
 })
 
 const emit = defineEmits(['file-selected'])

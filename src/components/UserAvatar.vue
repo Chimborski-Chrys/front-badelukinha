@@ -6,32 +6,32 @@ import { getCloudinaryUrl } from '@/utils/cloudinary'
 const props = defineProps({
   username: {
     type: String,
-    required: true
+    required: true,
   },
   avatar: {
     type: String,
-    default: null
+    default: null,
   },
   api: {
     type: String,
-    default: 'avataaars'
+    default: 'avataaars',
   },
   width: {
     type: Number,
-    default: 150
+    default: 150,
   },
   height: {
     type: Number,
-    default: 150
+    default: 150,
   },
   canChangePhoto: {
     type: Boolean,
-    default: false
+    default: false,
   },
   loading: {
     type: Boolean,
-    default: false
-  }
+    default: false,
+  },
 })
 
 const emit = defineEmits(['file-selected'])
@@ -53,7 +53,7 @@ const avatarUrl = computed(() => {
     props.avatar ??
     `https://api.dicebear.com/7.x/${props.api}/svg?seed=${props.username.replace(
       /[^a-z0-9]+/gi,
-      '-'
+      '-',
     )}.svg`
   )
 })
@@ -84,7 +84,7 @@ const handleFileChange = (event) => {
     />
     <div
       v-if="loading"
-      class="absolute inset-0 flex items-center justify-center rounded-full bg-black bg-opacity-50"
+      class="bg-opacity-50 absolute inset-0 flex items-center justify-center rounded-full bg-black"
     >
       <svg
         class="h-8 w-8 animate-spin text-white"
@@ -119,7 +119,7 @@ const handleFileChange = (event) => {
       v-if="canChangePhoto && !$slots.default"
       label="Mudar foto"
       color="info"
-      class="absolute bottom-0 right-0"
+      class="absolute right-0 bottom-0"
       small
       @click="selectFile"
     />

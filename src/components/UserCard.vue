@@ -12,8 +12,8 @@ const userName = computed(() => authStore.user?.nome)
 const props = defineProps({
   loading: {
     type: Boolean,
-    default: false
-  }
+    default: false,
+  },
 })
 
 const emit = defineEmits(['file-selected'])

@@ -1,12 +1,6 @@
 <script setup>
 import { ref, watch, computed, onMounted } from 'vue'
-import {
-  Chart,
-  ArcElement,
-  PieController,
-  Tooltip,
-  Legend
-} from 'chart.js'
+import { Chart, ArcElement, PieController, Tooltip, Legend } from 'chart.js'
 
 const props = defineProps({
   data: {
@@ -31,7 +25,7 @@ onMounted(() => {
       plugins: {
         legend: {
           display: true,
-          position: 'bottom'
+          position: 'bottom',
         },
       },
     },

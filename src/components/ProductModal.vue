@@ -15,7 +15,7 @@ const props = defineProps({
   produto: {
     type: Object,
     default: null,
-  }
+  },
 })
 
 const emit = defineEmits(['update:modelValue', 'contact'])
@@ -26,7 +26,9 @@ const close = () => {
 
 const formattedPrice = computed(() => {
   if (!props.produto || props.produto.precoMedio === undefined) return ''
-  return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(props.produto.precoMedio)
+  return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(
+    props.produto.precoMedio,
+  )
 })
 
 const whatsappUrl = computed(() => {
@@ -41,13 +43,13 @@ const registerWhatsappClick = async () => {
 
   // Verifica se jÃ¡ registrou clique no WhatsApp deste produto nesta sessÃ£o
   const sessionKey = `whatsapp_click_${props.produto.id}`
-  
+
   if (!sessionStorage.getItem(sessionKey)) {
     try {
-       await api.post(`/produtos/${props.produto.id}/clique-whatsapp`)
-       sessionStorage.setItem(sessionKey, 'true')
+      await api.post(`/produtos/${props.produto.id}/clique-whatsapp`)
+      sessionStorage.setItem(sessionKey, 'true')
     } catch (err) {
-       console.warn('Falha ao registrar clique no WhatsApp', err)
+      console.warn('Falha ao registrar clique no WhatsApp', err)
     }
   }
 
@@ -144,15 +146,15 @@ window.addEventListener('keydown', (e) => {
               <span class="text-2xl font-bold text-red-700">{{ formattedPrice }}</span>
             </div>
 
-                 <BaseButton
-                    :href="whatsappUrl"
-                    target="_blank"
-                    :icon="mdiWhatsapp"
-                    label="Solicitar Orçamento"
-                    color="success"
-                    class="w-full sm:w-auto flex-1 font-bold py-3 px-6 rounded-lg shadow hover:shadow-lg transition-all"
-                    @click="registerWhatsappClick"
-                  />
+            <BaseButton
+              :href="whatsappUrl"
+              target="_blank"
+              :icon="mdiWhatsapp"
+              label="Solicitar Orçamento"
+              color="success"
+              class="w-full flex-1 rounded-lg px-6 py-3 font-bold shadow transition-all hover:shadow-lg sm:w-auto"
+              @click="registerWhatsappClick"
+            />
           </div>
         </div>
       </div>

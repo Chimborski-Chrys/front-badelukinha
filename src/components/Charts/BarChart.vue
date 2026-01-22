@@ -7,7 +7,7 @@ import {
   LinearScale,
   CategoryScale,
   Tooltip,
-  Legend
+  Legend,
 } from 'chart.js'
 
 const props = defineProps({
@@ -35,19 +35,19 @@ onMounted(() => {
           beginAtZero: true,
           grid: {
             display: true,
-            color: 'rgba(0, 0, 0, 0.05)'
-          }
+            color: 'rgba(0, 0, 0, 0.05)',
+          },
         },
         x: {
           grid: {
-            display: false
-          }
+            display: false,
+          },
         },
       },
       plugins: {
         legend: {
           display: true,
-          position: 'bottom'
+          position: 'bottom',
         },
       },
     },

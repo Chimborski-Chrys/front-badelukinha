@@ -32,7 +32,7 @@ const routes = [
   {
     meta: {
       title: 'Dashboard',
-      requiresAuth: true // Marcador para rotas que precisam de autenticaÃ§Ã£o
+      requiresAuth: true, // Marcador para rotas que precisam de autenticaÃ§Ã£o
     },
     path: '/admin/dashboard',
     name: 'admin-dashboard',
@@ -41,7 +41,7 @@ const routes = [
   {
     meta: {
       title: 'Profile',
-      requiresAuth: true
+      requiresAuth: true,
     },
     path: '/admin/profile',
     name: 'admin-profile',
@@ -50,7 +50,7 @@ const routes = [
   {
     meta: {
       title: 'Meus Produtos',
-      requiresAuth: true
+      requiresAuth: true,
     },
     path: '/admin/produtos',
     name: 'admin-products',
@@ -59,7 +59,7 @@ const routes = [
   {
     meta: {
       title: 'Criar Costureira',
-      requiresAuth: true
+      requiresAuth: true,
     },
     path: '/admin/criar-costureira',
     name: 'admin-criar-costureira',
