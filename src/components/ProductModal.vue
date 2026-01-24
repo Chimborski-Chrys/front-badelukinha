@@ -34,7 +34,7 @@ const formattedPrice = computed(() => {
 const whatsappUrl = computed(() => {
   if (!props.produto) return '#'
   const phoneNumber = props.produto.usuario?.telefoneWhatsApp || '5541996147079'
-  const message = `OlÃ¡! Vi o produto "${props.produto.nome}" no AteliÃª Virtual e gostaria de solicitar um orÃ§amento.`
+  const message = `Olá! Vi o produto "${props.produto.nome}" no Ateliê Virtual e gostaria de solicitar um orçamento.`
   return `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`
 })
 
