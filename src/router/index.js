@@ -31,12 +31,13 @@ const routes = [
   // --- ROTAS ADMINISTRATIVAS (PRIVADAS) ---
   {
     meta: {
-      title: 'Dashboard',
-      requiresAuth: true, // Marcador para rotas que precisam de autenticaÃ§Ã£o
+      title: 'Dashboard do Administrador',
+      requiresAuth: true,
+      requiresSuperAdmin: true, // Rota apenas para SuperAdmin
     },
     path: '/admin/dashboard',
     name: 'admin-dashboard',
-    component: () => import('@/views/DashboardView.vue'),
+    component: () => import('@/views/AdminDashboard.vue'), // Aponta para o novo componente
   },
   {
     meta: {
@@ -76,9 +77,19 @@ const routes = [
     component: () => import('@/views/ErrorView.vue'),
   },
   // Redirecionamento de rotas antigas
+  // {
+  //   path: '/dashboard',
+  //   redirect: '/admin/dashboard',
+  // },
+
   {
+    meta: {
+      title: 'Dashboard da Costureira',
+      requiresAuth: true,
+    },
     path: '/dashboard',
-    redirect: '/admin/dashboard',
+    name: 'costureira-dashboard',
+    component: () => import('@/views/DashboardView.vue'),
   },
 ]
 
@@ -93,11 +104,25 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
   const authStore = useAuthStore()
 
-  if (to.meta.requiresAuth && !authStore.isAuthenticated) {
-    next('/login')
-  } else {
-    next()
+  // Verifica se a rota requer autenticação
+  if (to.meta.requiresAuth) {
+    // Se não estiver autenticado, redireciona para o login
+    if (!authStore.isAuthenticated) {
+      next('/login')
+      return
+    }
+
+    // Se a rota requer privilégios de SuperAdmin
+    if (to.meta.requiresSuperAdmin) {
+      // Se o usuário não for SuperAdmin, redireciona para erro
+      if (!authStore.user?.isSuperAdmin) {
+        next('/error') // Ou uma rota de "acesso negado"
+        return
+      }
+    }
   }
+
+  next()
 })
 
 export default router

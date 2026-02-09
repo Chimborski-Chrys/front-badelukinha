@@ -11,14 +11,14 @@ import LayoutGuest from '@/layouts/LayoutGuest.vue'
     <SectionFullScreen v-slot="{ cardClass }" bg="pinkRed">
       <CardBox :class="cardClass">
         <div class="space-y-3">
-          <h1 class="text-2xl">Unhandled exception</h1>
+          <h1 class="text-2xl">Ocorreu um Erro</h1>
 
-          <p>An Error Occurred</p>
+          <p>Uma exceção não tratada ocorreu.</p>
         </div>
 
         <template #footer>
           <BaseButtons>
-            <BaseButton label="Done" to="/dashboard" color="danger" />
+            <BaseButton label="Concluído" to="/" color="danger" />
           </BaseButtons>
         </template>
       </CardBox>

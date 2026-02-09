@@ -29,7 +29,13 @@ onMounted(() => {
 })
 
 const dynamicMenuAside = computed(() => {
-  const menu = JSON.parse(JSON.stringify(menuAside)) // Deep copy
+  let menu = JSON.parse(JSON.stringify(menuAside)); // Deep copy
+
+  // Se o usuário não for SuperAdmin, filtra os itens de menu que exigem privilégios de admin
+  if (!authStore.user?.isSuperAdmin) {
+    menu = menu.filter(item => !item.isAdmin);
+  }
+  
   const vitrineItem = menu.find((item) => item.label === 'Vitrine')
 
   if (vitrineItem && authStore.isAuthenticated && authStore.user?.id) {

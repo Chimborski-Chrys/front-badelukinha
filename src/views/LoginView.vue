@@ -34,13 +34,20 @@ const submit = async () => {
     })
 
     const { token, usuario } = response.data
+
+    if (!usuario.ativo) {
+      errorMessage.value = 'Usuário inativo. Por favor, entre em contato com o suporte.'
+      authStore.clearAuth()
+      return
+    }
+
     authStore.setAuth(usuario, token)
 
     // Redirecionamento condicional
     if (authStore.isSuperAdmin) {
-      router.push('/admin/criar-costureira') // Nova rota para o super admin
+      router.push('/admin/dashboard') // Nova rota para o super admin
     } else {
-      router.push('/admin/dashboard') // Rota normal para costureiras
+      router.push('/dashboard') // Rota para o dashboard da costureira
     }
   } catch (error) {
     console.error('Falha no login:', error)
