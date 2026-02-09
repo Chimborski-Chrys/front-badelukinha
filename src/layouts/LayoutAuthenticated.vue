@@ -34,11 +34,14 @@ const dynamicMenuAside = computed(() => {
   // Se o usuário não for SuperAdmin, filtra os itens de menu que exigem privilégios de admin
   if (!authStore.user?.isSuperAdmin) {
     menu = menu.filter(item => !item.isAdmin);
+  } else { // Se for SuperAdmin, remove itens específicos de costureiras
+    menu = menu.filter(item => !item.isCostureira);
   }
   
   const vitrineItem = menu.find((item) => item.label === 'Vitrine')
 
-  if (vitrineItem && authStore.isAuthenticated && authStore.user?.id) {
+  // Se o usuário for autenticado e não for SuperAdmin, direciona para a loja do usuário
+  if (vitrineItem && authStore.isAuthenticated && authStore.user?.id && !authStore.user?.isSuperAdmin) {
     vitrineItem.to = '/loja/' + authStore.user.id
   }
 

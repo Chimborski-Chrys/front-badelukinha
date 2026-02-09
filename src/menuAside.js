@@ -16,6 +16,7 @@ export default [
     to: '/admin/produtos',
     label: 'Meus Produtos',
     icon: mdiTag,
+    isCostureira: true,
   },
   {
     to: '/admin/criar-costureira',
