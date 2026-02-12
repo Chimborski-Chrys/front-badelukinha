@@ -15,9 +15,9 @@ const routes = [
     meta: {
       title: 'Loja da Costureira',
     },
-    path: '/loja/:id',
+    path: '/loja/:marca',
     name: 'loja',
-    component: () => import('@/views/VitrineView.vue'), // Usando VitrineView como placeholder
+    component: () => import('@/views/LojaView.vue'), // Alterado para LojaView.vue
   },
   {
     meta: {

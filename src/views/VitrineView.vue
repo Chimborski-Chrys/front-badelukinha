@@ -113,7 +113,7 @@ const pageSubtitle = computed(() => {
   if (storeName.value) {
     return 'Confira as peças exclusivas desta marca.'
   }
-  return 'Explore nossas criações feitas com amor e carinho para os pequenos.'
+  return 'Explore criações únicas, feitas à mão com paixão e arte.'
 })
 
 // --- Methods ---
@@ -196,10 +196,18 @@ const getCategoryLabel = (categoryKey) => {
                   class="mb-2 self-start"
                 />
                 <h3
-                  class="mb-4 line-clamp-2 flex-grow text-lg leading-tight font-bold text-gray-800"
+                  class="mb-2 line-clamp-2 flex-grow text-lg leading-tight font-bold text-gray-800"
                 >
                   {{ produto.nome }}
                 </h3>
+                <router-link
+                  v-if="produto?.usuario?.nomeMarca"
+                  :to="{ name: 'loja', params: { marca: produto.usuario.nomeMarca } }"
+                  class="text-sm text-gray-500 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400 transition-colors duration-200"
+                  @click.stop
+                >
+                  Por: {{ produto.usuario.nomeMarca || produto.usuario.nome }}
+                </router-link>
 
                 <BaseButton
                   label="Ver Detalhes"

@@ -117,8 +117,8 @@ window.addEventListener('keydown', (e) => {
             <div class="flex items-center gap-1 text-sm text-gray-500">
               <span>Criado por:</span>
               <router-link
-                v-if="produto?.usuarioId"
-                :to="{ name: 'loja', params: { id: produto.usuarioId } }"
+                v-if="produto?.usuario?.nomeMarca"
+                :to="{ name: 'loja', params: { marca: produto.usuario.nomeMarca } }"
                 class="cursor-pointer font-bold text-red-600 transition-colors hover:text-red-800 hover:underline"
                 @click="close"
               >

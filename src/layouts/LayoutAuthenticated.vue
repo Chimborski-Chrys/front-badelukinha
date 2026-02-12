@@ -41,8 +41,8 @@ const dynamicMenuAside = computed(() => {
   const vitrineItem = menu.find((item) => item.label === 'Vitrine')
 
   // Se o usuário for autenticado e não for SuperAdmin, direciona para a loja do usuário
-  if (vitrineItem && authStore.isAuthenticated && authStore.user?.id && !authStore.user?.isSuperAdmin) {
-    vitrineItem.to = '/loja/' + authStore.user.id
+  if (vitrineItem && authStore.isAuthenticated && authStore.user?.nomeMarca && !authStore.user?.isSuperAdmin) {
+    vitrineItem.to = '/loja/' + authStore.user.nomeMarca
   }
 
   return menu
