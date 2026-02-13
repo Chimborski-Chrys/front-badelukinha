@@ -19,6 +19,7 @@ const authStore = useAuthStore()
 
 const profileForm = reactive({
   nome: '',
+  nomeMarca: '',
   email: '',
   sobre: '', // Adicionado o campo "sobre"
 })
@@ -29,6 +30,7 @@ watch(
   (newUser) => {
     if (newUser) {
       profileForm.nome = newUser.nome || ''
+      profileForm.nomeMarca = newUser.nomeMarca || ''
       profileForm.email = newUser.email || ''
       profileForm.sobre = newUser.sobre || '' // Preenche o campo "sobre"
     }
@@ -84,7 +86,7 @@ const salvarPerfil = async () => {
   try {
     const { data } = await api.put('/perfil', profileForm)
     // Atualiza o store de autenticação com a mesma capitalização
-    authStore.updateUser({ nome: profileForm.nome, email: profileForm.email, sobre: profileForm.sobre })
+    authStore.updateUser({ nome: profileForm.nome, email: profileForm.email, sobre: profileForm.sobre, nomeMarca: profileForm.nomeMarca })
     notification.value = {
       show: true,
       color: 'success',
@@ -148,6 +150,15 @@ const salvarSenha = async () => {
               name="username"
               required
               autocomplete="username"
+            />
+          </FormField>
+          <FormField label="Nome da Marca" help="O nome público da sua loja/marca">
+            <FormControl
+              v-model="profileForm.nomeMarca"
+              :icon="mdiAccount"
+              name="brandname"
+              required
+              autocomplete="organization"
             />
           </FormField>
           <FormField label="E-mail" help="Obrigatório. Seu e-mail">

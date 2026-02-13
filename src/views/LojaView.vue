@@ -5,10 +5,11 @@ import LayoutGuest from '@/layouts/LayoutGuest.vue'
 import CardBox from '@/components/CardBox.vue'
 import CardBoxComponentEmpty from '@/components/CardBoxComponentEmpty.vue'
 import BaseButton from '@/components/BaseButton.vue'
-import PillTag from '@/components/PillTag.vue' // Adicionar PillTag
-import ProductModal from '@/components/ProductModal.vue' // Importar o ProductModal
+import PillTag from '@/components/PillTag.vue'
+import ProductModal from '@/components/ProductModal.vue'
+import FormControl from '@/components/FormControl.vue' // Importar FormControl
 import api from '@/services/api'
-import { mdiInformationVariant, mdiWhatsapp, mdiLayers, mdiTag, mdiStar, mdiTshirtCrew, mdiEye } from '@mdi/js'
+import { mdiWhatsapp, mdiLayers, mdiTag, mdiStar, mdiTshirtCrew, mdiEye, mdiMagnify } from '@mdi/js' // Adicionar mdiMagnify
 
 const route = useRoute()
 const costureira = ref(null)
@@ -19,6 +20,9 @@ const notification = ref({
   message: '',
 })
 
+const searchTermLoja = ref('') // Novo: Termo de busca para produtos da loja
+const lojaProdutos = ref([]) // Novo: Lista de produtos da loja
+
 // --- Modal State for Products ---
 const isProductModalOpen = ref(false)
 const selectedProductInModal = ref(null)
@@ -27,10 +31,9 @@ const handleShowProductDetails = async (produto) => {
   selectedProductInModal.value = produto
   isProductModalOpen.value = true
 
-  // Lógica de registro de clique (copiada da VitrineView.vue)
   const sessionKey = `viewed_product_${produto.id}`
   if (sessionStorage.getItem(sessionKey)) {
-    return // Já contou, não faz nada
+    return
   }
 
   try {
@@ -45,7 +48,8 @@ const fetchCostureiraData = async (marca) => {
   isLoading.value = true
   notification.value.show = false
   try {
-    const response = await api.get(`/Costureiras/publico/marca/${marca}`) // Usar o novo endpoint por marca
+    // Busca apenas o perfil da costureira, sem os produtos aninhados
+    const response = await api.get(`/Costureiras/publico/marca/${marca}`)
     costureira.value = response.data
   } catch (error) {
     console.error('Erro ao buscar dados da costureira:', error)
@@ -57,6 +61,24 @@ const fetchCostureiraData = async (marca) => {
     }
   } finally {
     isLoading.value = false
+  }
+}
+
+const fetchLojaProdutos = async () => {
+  if (!costureira.value?.id) {
+    lojaProdutos.value = []
+    return
+  }
+
+  try {
+    const params = {
+      searchTerm: searchTermLoja.value,
+    }
+    const response = await api.get(`/Costureiras/${costureira.value.id}/produtos`, { params })
+    lojaProdutos.value = response.data
+  } catch (error) {
+    console.error('Erro ao buscar produtos da loja:', error)
+    lojaProdutos.value = []
   }
 }
 
@@ -75,20 +97,25 @@ const getCategoryLabel = (categoryKey) => {
   if (categoryMap[categoryKey]) {
     return categoryMap[categoryKey].label
   }
-  // Capitalize first letter of raw category
   return categoryKey.charAt(0).toUpperCase() + categoryKey.slice(1)
 }
 
 // Observa mudanças no parâmetro 'marca' da rota e recarrega os dados
 watch(
   () => route.params.marca,
-  (newMarca) => {
+  async (newMarca) => {
     if (newMarca) {
-      fetchCostureiraData(newMarca)
+      await fetchCostureiraData(newMarca)
+      await fetchLojaProdutos() // Carrega os produtos da loja com o searchTermLoja atual (que pode ser vazio)
     }
   },
-  { immediate: true } // Executa imediatamente na montagem do componente
+  { immediate: true },
 )
+
+// Observa mudanças no searchTermLoja para recarregar os produtos
+watch(searchTermLoja, () => {
+  fetchLojaProdutos()
+})
 </script>
 
 <template>
@@ -103,12 +130,12 @@ watch(
       </NotificationBar>
 
       <CardBox v-if="isLoading" class="mb-6">
-        <p class="text-center py-4">Carregando dados da loja...</p>
+        <p class="py-4 text-center">Carregando dados da loja...</p>
       </CardBox>
 
       <CardBox v-else-if="!costureira" class="mb-6">
         <CardBoxComponentEmpty />
-        <p class="text-center py-4">Loja não encontrada ou não é mais válida.</p>
+        <p class="py-4 text-center">Loja não encontrada ou não é mais válida.</p>
       </CardBox>
 
       <div v-else class="container mx-auto">
@@ -128,7 +155,7 @@ watch(
           />
           <div
             v-else
-            class="mb-4 flex h-24 w-24 items-center justify-center rounded-full bg-gray-200 text-xl text-gray-500 dark:bg-slate-700 dark:text-gray-400 mx-auto"
+            class="mx-auto mb-4 flex h-24 w-24 items-center justify-center rounded-full bg-gray-200 text-xl text-gray-500 dark:bg-slate-700 dark:text-gray-400"
           >
             {{ costureira.nome ? costureira.nome.charAt(0).toUpperCase() : '?' }}
           </div>
@@ -154,11 +181,22 @@ watch(
 
         <!-- Produtos da Loja -->
         <div class="container mx-auto">
+          <div class="mb-6 flex items-center justify-center gap-2">
+            <FormControl
+              v-model="searchTermLoja"
+              :icon="mdiMagnify"
+              placeholder="Buscar produtos nesta loja..."
+              class="w-full md:w-1/2"
+              @keyup.enter="fetchLojaProdutos"
+            />
+            <BaseButton label="Buscar" :icon="mdiMagnify" color="info" @click="fetchLojaProdutos" />
+          </div>
+
           <div
-            v-if="costureira.produtos && costureira.produtos.length > 0"
+            v-if="lojaProdutos && lojaProdutos.length > 0"
             class="grid grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
           >
-            <div v-for="produto in costureira.produtos" :key="produto.id" class="group">
+            <div v-for="produto in lojaProdutos" :key="produto.id" class="group">
               <CardBox
                 class="flex h-full cursor-pointer flex-col overflow-hidden border-2 border-dashed border-red-200 bg-white/95 shadow-lg transition-all duration-500 hover:shadow-2xl"
                 @click="handleShowProductDetails(produto)"
@@ -197,7 +235,9 @@ watch(
           </div>
           <CardBox v-else>
             <CardBoxComponentEmpty />
-            <p class="text-center py-4">Esta loja ainda não possui produtos cadastrados.</p>
+            <p class="py-4 text-center">
+              Esta loja ainda não possui produtos cadastrados ou encontrados com o termo de busca.
+            </p>
           </CardBox>
         </div>
       </div>
