@@ -31,6 +31,15 @@ const routes = [
   // --- ROTAS ADMINISTRATIVAS (PRIVADAS) ---
   {
     meta: {
+      title: 'Dashboard',
+      requiresAuth: true,
+    },
+    path: '/dashboard',
+    name: 'dashboard',
+    component: () => import('@/views/DashboardView.vue'), // Dashboard padrão para usuários
+  },
+  {
+    meta: {
       title: 'Dashboard do Administrador',
       requiresAuth: true,
       requiresSuperAdmin: true, // Rota apenas para SuperAdmin
@@ -109,6 +118,19 @@ router.beforeEach((to, from, next) => {
     // Se não estiver autenticado, redireciona para o login
     if (!authStore.isAuthenticated) {
       next('/login')
+      return
+    }
+
+    // Verifica se a rota é de admin e o usuário não é admin
+    const allowedForCostureira = ['/admin/profile', '/admin/produtos']
+
+    if (
+      to.path.startsWith('/admin') &&
+      !authStore.user?.isSuperAdmin &&
+      !allowedForCostureira.includes(to.path)
+    ) {
+      // Redireciona para o dashboard normal ou página de acesso negado
+      next('/dashboard') // Ou '/acesso-negado'
       return
     }
 

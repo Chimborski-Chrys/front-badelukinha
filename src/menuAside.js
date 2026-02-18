@@ -5,7 +5,13 @@ export default [
     to: '/admin/dashboard',
     icon: mdiMonitor,
     label: 'Dashboard',
-    isAdmin: true, // Apenas para administradores
+    isAdmin: true,
+  },
+  {
+    to: '/dashboard',
+    icon: mdiMonitor,
+    label: 'Dashboard',
+    isNotAdmin: true, // Marker for costureiras
   },
   {
     to: '/admin/profile',
@@ -16,7 +22,7 @@ export default [
     to: '/admin/produtos',
     label: 'Meus Produtos',
     icon: mdiTag,
-    isCostureira: true,
+    isNotAdmin: true,
   },
   {
     to: '/admin/criar-costureira',

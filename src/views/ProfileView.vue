@@ -1,5 +1,5 @@
 ﻿<script setup>
-import { reactive, ref, watch } from 'vue'
+import { reactive, ref, onMounted } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { mdiAccount, mdiMail, mdiAsterisk, mdiFormTextboxPassword } from '@mdi/js'
 import SectionMain from '@/components/SectionMain.vue'
@@ -24,19 +24,24 @@ const profileForm = reactive({
   sobre: '', // Adicionado o campo "sobre"
 })
 
-// Observa o usuário do store e preenche o formulário quando o usuário estiver disponível.
-watch(
-  () => authStore.user,
-  (newUser) => {
-    if (newUser) {
-      profileForm.nome = newUser.nome || ''
-      profileForm.nomeMarca = newUser.nomeMarca || ''
-      profileForm.email = newUser.email || ''
-      profileForm.sobre = newUser.sobre || '' // Preenche o campo "sobre"
-    }
-  },
-  { immediate: true },
-)
+const fetchProfileData = async () => {
+  try {
+    const { data } = await api.get('/perfil')
+    profileForm.nome = data.nome || ''
+    profileForm.nomeMarca = data.nomeMarca || ''
+    profileForm.email = data.email || ''
+    profileForm.sobre = data.sobre || ''
+
+    // Atualiza o store se necessário para manter consistência
+    authStore.updateUser(data)
+  } catch (error) {
+    console.error('Erro ao buscar dados do perfil:', error)
+  }
+}
+
+onMounted(() => {
+  fetchProfileData()
+})
 
 const passwordForm = reactive({
   senhaAtual: '',

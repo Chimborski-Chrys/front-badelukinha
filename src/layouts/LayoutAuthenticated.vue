@@ -35,7 +35,7 @@ const dynamicMenuAside = computed(() => {
   if (!authStore.user?.isSuperAdmin) {
     menu = menu.filter(item => !item.isAdmin);
   } else { // Se for SuperAdmin, remove itens específicos de costureiras
-    menu = menu.filter(item => !item.isCostureira);
+    menu = menu.filter(item => !item.isNotAdmin);
   }
   
   const vitrineItem = menu.find((item) => item.label === 'Vitrine')
