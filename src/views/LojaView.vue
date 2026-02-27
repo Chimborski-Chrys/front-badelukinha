@@ -167,6 +167,17 @@ watch(searchTermLoja, () => {
             {{ costureira.sobre || 'Explore os produtos exclusivos desta loja.' }}
           </p>
 
+          <!-- Tags de Serviços -->
+          <div v-if="costureira.servicos && costureira.servicos.length > 0" class="mt-4 flex flex-wrap justify-center gap-2">
+            <PillTag
+              v-for="servico in costureira.servicos"
+              :key="servico"
+              :label="servico"
+              color="info"
+              small
+            />
+          </div>
+
           <BaseButton
             v-if="costureira.telefoneWhatsApp"
             :href="`https://wa.me/${costureira.telefoneWhatsApp}`"

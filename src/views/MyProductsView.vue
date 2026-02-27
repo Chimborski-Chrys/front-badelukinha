@@ -77,6 +77,11 @@ const storageUsagePercent = computed(() => {
   return (dashboardStats.value.storageUsado / dashboardStats.value.storageLimite) * 100
 })
 
+const storageAvailable = computed(() => {
+  if (!dashboardStats.value || !dashboardStats.value.storageLimite) return 0
+  return Math.max(0, dashboardStats.value.storageLimite - dashboardStats.value.storageUsado)
+})
+
 const openModal = (product = null) => {
   if (product) {
     currentProduct.value = { ...product, precoMedio: product.precoMedio || 0 }
@@ -173,8 +178,8 @@ onMounted(() => {
           <p class="text-sm text-gray-600">
             Você utilizou
             <b class="text-gray-800">{{ formatBytes(dashboardStats.storageUsado) }}</b> de
-            <b class="text-gray-800">{{ formatBytes(dashboardStats.storageLimite) }}</b
-            >.
+            <b class="text-gray-800">{{ formatBytes(dashboardStats.storageLimite) }}</b>.
+            Disponível: <b class="text-emerald-600">{{ formatBytes(storageAvailable) }}</b>
           </p>
           <div class="mt-2 h-2 w-full rounded-full bg-gray-200">
             <div

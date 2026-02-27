@@ -7,6 +7,7 @@ import CardBox from '@/components/CardBox.vue'
 import BaseDivider from '@/components/BaseDivider.vue'
 import FormField from '@/components/FormField.vue'
 import FormControl from '@/components/FormControl.vue'
+import FormCheckRadioGroup from '@/components/FormCheckRadioGroup.vue'
 import BaseButton from '@/components/BaseButton.vue'
 import BaseButtons from '@/components/BaseButtons.vue'
 import UserCard from '@/components/UserCard.vue'
@@ -21,8 +22,24 @@ const profileForm = reactive({
   nome: '',
   nomeMarca: '',
   email: '',
-  sobre: '', // Adicionado o campo "sobre"
+  sobre: '',
+  servicosIds: [],
 })
+
+const servicosDisponiveis = ref({})
+
+const fetchServicosDisponiveis = async () => {
+  try {
+    const { data } = await api.get('/perfil/servicos-disponiveis')
+    // Converte [{id, nome}] para {id: nome}
+    servicosDisponiveis.value = data.reduce((acc, curr) => {
+      acc[curr.id] = curr.nome
+      return acc
+    }, {})
+  } catch (error) {
+    console.error('Erro ao buscar serviços disponíveis:', error)
+  }
+}
 
 const fetchProfileData = async () => {
   try {
@@ -31,6 +48,7 @@ const fetchProfileData = async () => {
     profileForm.nomeMarca = data.nomeMarca || ''
     profileForm.email = data.email || ''
     profileForm.sobre = data.sobre || ''
+    profileForm.servicosIds = data.servicosIds || []
 
     // Atualiza o store se necessário para manter consistência
     authStore.updateUser(data)
@@ -40,6 +58,7 @@ const fetchProfileData = async () => {
 }
 
 onMounted(() => {
+  fetchServicosDisponiveis()
   fetchProfileData()
 })
 
@@ -91,7 +110,13 @@ const salvarPerfil = async () => {
   try {
     const { data } = await api.put('/perfil', profileForm)
     // Atualiza o store de autenticação com a mesma capitalização
-    authStore.updateUser({ nome: profileForm.nome, email: profileForm.email, sobre: profileForm.sobre, nomeMarca: profileForm.nomeMarca })
+    authStore.updateUser({ 
+      nome: profileForm.nome, 
+      email: profileForm.email, 
+      sobre: profileForm.sobre, 
+      nomeMarca: profileForm.nomeMarca,
+      servicosIds: profileForm.servicosIds 
+    })
     notification.value = {
       show: true,
       color: 'success',
@@ -183,6 +208,16 @@ const salvarSenha = async () => {
               name="sobre"
               placeholder="Minha marca é..."
               :maxlength="500"
+            />
+          </FormField>
+
+          <BaseDivider />
+
+          <FormField label="Serviços Prestados" help="Selecione os tipos de serviços que você oferece">
+            <FormCheckRadioGroup
+              v-model="profileForm.servicosIds"
+              name="servicos"
+              :options="servicosDisponiveis"
             />
           </FormField>
 
