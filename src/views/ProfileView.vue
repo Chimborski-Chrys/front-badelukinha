@@ -172,7 +172,11 @@ const salvarSenha = async () => {
       <UserCard class="mb-6" :loading="isUploadingPhoto" @file-selected="handleFileSelected" />
 
       <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        <CardBox is-form @submit.prevent="salvarPerfil">
+        <CardBox
+          is-form
+          :class="{ 'lg:col-span-2': !authStore.user?.hasPassword }"
+          @submit.prevent="salvarPerfil"
+        >
           <FormField label="Nome" help="Obrigatório. Seu nome">
             <FormControl
               v-model="profileForm.nome"
@@ -228,7 +232,7 @@ const salvarSenha = async () => {
           </template>
         </CardBox>
 
-        <CardBox is-form @submit.prevent="salvarSenha">
+        <CardBox v-if="authStore.user?.hasPassword" is-form @submit.prevent="salvarSenha">
           <FormField label="Senha atual" help="Obrigatório. Sua senha atual">
             <FormControl
               v-model="passwordForm.senhaAtual"
