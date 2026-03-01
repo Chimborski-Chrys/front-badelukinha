@@ -1,5 +1,5 @@
 ﻿<script setup>
-import { reactive, ref, watch } from 'vue'
+import { reactive, ref, onMounted } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { mdiAccount, mdiMail, mdiAsterisk, mdiFormTextboxPassword } from '@mdi/js'
 import SectionMain from '@/components/SectionMain.vue'
@@ -7,6 +7,7 @@ import CardBox from '@/components/CardBox.vue'
 import BaseDivider from '@/components/BaseDivider.vue'
 import FormField from '@/components/FormField.vue'
 import FormControl from '@/components/FormControl.vue'
+import FormCheckRadioGroup from '@/components/FormCheckRadioGroup.vue'
 import BaseButton from '@/components/BaseButton.vue'
 import BaseButtons from '@/components/BaseButtons.vue'
 import UserCard from '@/components/UserCard.vue'
@@ -19,20 +20,47 @@ const authStore = useAuthStore()
 
 const profileForm = reactive({
   nome: '',
+  nomeMarca: '',
   email: '',
+  sobre: '',
+  servicosIds: [],
 })
 
-// Observa o usuário do store e preenche o formulário quando o usuário estiver disponível.
-watch(
-  () => authStore.user,
-  (newUser) => {
-    if (newUser) {
-      profileForm.nome = newUser.nome || ''
-      profileForm.email = newUser.email || ''
-    }
-  },
-  { immediate: true },
-)
+const servicosDisponiveis = ref({})
+
+const fetchServicosDisponiveis = async () => {
+  try {
+    const { data } = await api.get('/perfil/servicos-disponiveis')
+    // Converte [{id, nome}] para {id: nome}
+    servicosDisponiveis.value = data.reduce((acc, curr) => {
+      acc[curr.id] = curr.nome
+      return acc
+    }, {})
+  } catch (error) {
+    console.error('Erro ao buscar serviços disponíveis:', error)
+  }
+}
+
+const fetchProfileData = async () => {
+  try {
+    const { data } = await api.get('/perfil')
+    profileForm.nome = data.nome || ''
+    profileForm.nomeMarca = data.nomeMarca || ''
+    profileForm.email = data.email || ''
+    profileForm.sobre = data.sobre || ''
+    profileForm.servicosIds = data.servicosIds || []
+
+    // Atualiza o store se necessário para manter consistência
+    authStore.updateUser(data)
+  } catch (error) {
+    console.error('Erro ao buscar dados do perfil:', error)
+  }
+}
+
+onMounted(() => {
+  fetchServicosDisponiveis()
+  fetchProfileData()
+})
 
 const passwordForm = reactive({
   senhaAtual: '',
@@ -82,7 +110,13 @@ const salvarPerfil = async () => {
   try {
     const { data } = await api.put('/perfil', profileForm)
     // Atualiza o store de autenticação com a mesma capitalização
-    authStore.updateUser({ nome: profileForm.nome, email: profileForm.email })
+    authStore.updateUser({ 
+      nome: profileForm.nome, 
+      email: profileForm.email, 
+      sobre: profileForm.sobre, 
+      nomeMarca: profileForm.nomeMarca,
+      servicosIds: profileForm.servicosIds 
+    })
     notification.value = {
       show: true,
       color: 'success',
@@ -138,7 +172,11 @@ const salvarSenha = async () => {
       <UserCard class="mb-6" :loading="isUploadingPhoto" @file-selected="handleFileSelected" />
 
       <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        <CardBox is-form @submit.prevent="salvarPerfil">
+        <CardBox
+          is-form
+          :class="{ 'lg:col-span-2': !authStore.user?.hasPassword }"
+          @submit.prevent="salvarPerfil"
+        >
           <FormField label="Nome" help="Obrigatório. Seu nome">
             <FormControl
               v-model="profileForm.nome"
@@ -146,6 +184,15 @@ const salvarSenha = async () => {
               name="username"
               required
               autocomplete="username"
+            />
+          </FormField>
+          <FormField label="Nome da Marca" help="O nome público da sua loja/marca">
+            <FormControl
+              v-model="profileForm.nomeMarca"
+              :icon="mdiAccount"
+              name="brandname"
+              required
+              autocomplete="organization"
             />
           </FormField>
           <FormField label="E-mail" help="Obrigatório. Seu e-mail">
@@ -158,6 +205,25 @@ const salvarSenha = async () => {
               autocomplete="email"
             />
           </FormField>
+          <FormField label="Sobre a Marca" help="Conte sobre sua marca e seus serviços (máx. 500 caracteres).">
+            <FormControl
+              v-model="profileForm.sobre"
+              type="textarea"
+              name="sobre"
+              placeholder="Minha marca é..."
+              :maxlength="500"
+            />
+          </FormField>
+
+          <BaseDivider />
+
+          <FormField label="Serviços Prestados" help="Selecione os tipos de serviços que você oferece">
+            <FormCheckRadioGroup
+              v-model="profileForm.servicosIds"
+              name="servicos"
+              :options="servicosDisponiveis"
+            />
+          </FormField>
 
           <template #footer>
             <BaseButtons>
@@ -166,7 +232,7 @@ const salvarSenha = async () => {
           </template>
         </CardBox>
 
-        <CardBox is-form @submit.prevent="salvarSenha">
+        <CardBox v-if="authStore.user?.hasPassword" is-form @submit.prevent="salvarSenha">
           <FormField label="Senha atual" help="Obrigatório. Sua senha atual">
             <FormControl
               v-model="passwordForm.senhaAtual"

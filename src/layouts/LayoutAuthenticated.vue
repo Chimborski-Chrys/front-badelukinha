@@ -1,5 +1,5 @@
 ﻿<script setup>
-import { mdiForwardburger, mdiBackburger, mdiMenu } from '@mdi/js'
+import { mdiForwardburger, mdiBackburger, mdiMenu, mdiStore } from '@mdi/js'
 import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import menuAside from '@/menuAside.js'
@@ -29,11 +29,31 @@ onMounted(() => {
 })
 
 const dynamicMenuAside = computed(() => {
-  const menu = JSON.parse(JSON.stringify(menuAside)) // Deep copy
-  const vitrineItem = menu.find((item) => item.label === 'Vitrine')
+  let menu = JSON.parse(JSON.stringify(menuAside)); // Deep copy
 
-  if (vitrineItem && authStore.isAuthenticated && authStore.user?.id) {
-    vitrineItem.to = '/loja/' + authStore.user.id
+  // Se o usuário não for SuperAdmin, filtra os itens de menu que exigem privilégios de admin
+  if (!authStore.user?.isSuperAdmin) {
+    menu = menu.filter(item => !item.isAdmin);
+  } else { // Se for SuperAdmin, remove itens específicos de costureiras
+    menu = menu.filter(item => !item.isNotAdmin);
+  }
+  
+  // Se o usuário for autenticado e não for SuperAdmin, ajusta os itens de vitrine
+  if (authStore.isAuthenticated && authStore.user?.nomeMarca && !authStore.user?.isSuperAdmin) {
+    const vitrineIndex = menu.findIndex((item) => item.label === 'Vitrine')
+    
+    if (vitrineIndex !== -1) {
+      // Renomeia o item existente para "Minha Vitrine" e aponta para a loja dela
+      menu[vitrineIndex].label = 'Minha Vitrine'
+      menu[vitrineIndex].to = '/loja/' + authStore.user.nomeMarca
+      
+      // Adiciona o novo item "Vitrine" (geral) apontando para a home
+      menu.push({
+        to: '/',
+        label: 'Vitrine',
+        icon: mdiStore
+      })
+    }
   }
 
   return menu

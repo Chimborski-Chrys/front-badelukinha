@@ -15,9 +15,9 @@ const routes = [
     meta: {
       title: 'Loja da Costureira',
     },
-    path: '/loja/:id',
+    path: '/loja/:marca',
     name: 'loja',
-    component: () => import('@/views/VitrineView.vue'), // Usando VitrineView como placeholder
+    component: () => import('@/views/LojaView.vue'), // Alterado para LojaView.vue
   },
   {
     meta: {
@@ -32,11 +32,21 @@ const routes = [
   {
     meta: {
       title: 'Dashboard',
-      requiresAuth: true, // Marcador para rotas que precisam de autenticaÃ§Ã£o
+      requiresAuth: true,
+    },
+    path: '/dashboard',
+    name: 'dashboard',
+    component: () => import('@/views/DashboardView.vue'), // Dashboard padrão para usuários
+  },
+  {
+    meta: {
+      title: 'Dashboard do Administrador',
+      requiresAuth: true,
+      requiresSuperAdmin: true, // Rota apenas para SuperAdmin
     },
     path: '/admin/dashboard',
     name: 'admin-dashboard',
-    component: () => import('@/views/DashboardView.vue'),
+    component: () => import('@/views/AdminDashboard.vue'), // Aponta para o novo componente
   },
   {
     meta: {
@@ -76,9 +86,19 @@ const routes = [
     component: () => import('@/views/ErrorView.vue'),
   },
   // Redirecionamento de rotas antigas
+  // {
+  //   path: '/dashboard',
+  //   redirect: '/admin/dashboard',
+  // },
+
   {
+    meta: {
+      title: 'Dashboard da Costureira',
+      requiresAuth: true,
+    },
     path: '/dashboard',
-    redirect: '/admin/dashboard',
+    name: 'costureira-dashboard',
+    component: () => import('@/views/DashboardView.vue'),
   },
 ]
 
@@ -93,11 +113,38 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
   const authStore = useAuthStore()
 
-  if (to.meta.requiresAuth && !authStore.isAuthenticated) {
-    next('/login')
-  } else {
-    next()
+  // Verifica se a rota requer autenticação
+  if (to.meta.requiresAuth) {
+    // Se não estiver autenticado, redireciona para o login
+    if (!authStore.isAuthenticated) {
+      next('/login')
+      return
+    }
+
+    // Verifica se a rota é de admin e o usuário não é admin
+    const allowedForCostureira = ['/admin/profile', '/admin/produtos']
+
+    if (
+      to.path.startsWith('/admin') &&
+      !authStore.user?.isSuperAdmin &&
+      !allowedForCostureira.includes(to.path)
+    ) {
+      // Redireciona para o dashboard normal ou página de acesso negado
+      next('/dashboard') // Ou '/acesso-negado'
+      return
+    }
+
+    // Se a rota requer privilégios de SuperAdmin
+    if (to.meta.requiresSuperAdmin) {
+      // Se o usuário não for SuperAdmin, redireciona para erro
+      if (!authStore.user?.isSuperAdmin) {
+        next('/error') // Ou uma rota de "acesso negado"
+        return
+      }
+    }
   }
+
+  next()
 })
 
 export default router

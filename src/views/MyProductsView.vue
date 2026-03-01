@@ -1,6 +1,6 @@
 <script setup>
-import { ref, onMounted } from 'vue'
-import { mdiStore, mdiPencil, mdiTrashCan, mdiPlus } from '@mdi/js'
+import { ref, onMounted, computed } from 'vue'
+import { mdiStore, mdiPencil, mdiTrashCan, mdiPlus, mdiDatabase } from '@mdi/js'
 import SectionMain from '@/components/SectionMain.vue'
 import SectionTitleLineWithButton from '@/components/SectionTitleLineWithButton.vue'
 import CardBox from '@/components/CardBox.vue'
@@ -10,12 +10,15 @@ import LayoutAuthenticated from '@/layouts/LayoutAuthenticated.vue'
 import CardBoxModal from '@/components/CardBoxModal.vue'
 import FormField from '@/components/FormField.vue'
 import FormControl from '@/components/FormControl.vue'
+import FormFilePicker from '@/components/FormFilePicker.vue'
+import PillTag from '@/components/PillTag.vue'
 import api from '@/services/api'
 
 const products = ref([])
 const isModalActive = ref(false)
 const isDeleteModalActive = ref(false)
 const isLoading = ref(false)
+const dashboardStats = ref(null)
 
 const categories = [
   { id: 'vestido', label: 'Vestidos' },
@@ -32,10 +35,10 @@ const defaultProduct = {
   descricao: '',
   categoria: 'vestido',
   precoMedio: 0,
-  imagemUrl: '',
 }
 
 const currentProduct = ref({ ...defaultProduct })
+const productImageFile = ref(null)
 const productToDelete = ref(null)
 
 const fetchProducts = async () => {
@@ -51,12 +54,41 @@ const fetchProducts = async () => {
   }
 }
 
+const fetchDashboardStats = async () => {
+  try {
+    const response = await api.get('/dashboard/estatisticas')
+    dashboardStats.value = response.data
+  } catch (error) {
+    console.error('Erro ao buscar estatísticas do dashboard:', error)
+  }
+}
+
+const formatBytes = (bytes, decimals = 2) => {
+  if (!bytes || bytes === 0) return '0 Bytes'
+  const k = 1024
+  const dm = decimals < 0 ? 0 : decimals
+  const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB']
+  const i = Math.floor(Math.log(bytes) / Math.log(k))
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i]
+}
+
+const storageUsagePercent = computed(() => {
+  if (!dashboardStats.value || !dashboardStats.value.storageLimite) return 0
+  return (dashboardStats.value.storageUsado / dashboardStats.value.storageLimite) * 100
+})
+
+const storageAvailable = computed(() => {
+  if (!dashboardStats.value || !dashboardStats.value.storageLimite) return 0
+  return Math.max(0, dashboardStats.value.storageLimite - dashboardStats.value.storageUsado)
+})
+
 const openModal = (product = null) => {
   if (product) {
-    currentProduct.value = { ...product }
+    currentProduct.value = { ...product, precoMedio: product.precoMedio || 0 }
   } else {
     currentProduct.value = { ...defaultProduct }
   }
+  productImageFile.value = null
   isModalActive.value = true
 }
 
@@ -67,22 +99,37 @@ const openDeleteModal = (product) => {
 
 const submitProduct = async () => {
   try {
-    const payload = {
-      nome: currentProduct.value.nome,
-      descricao: currentProduct.value.descricao,
-      categoria: currentProduct.value.categoria,
-      precoMedio: parseFloat(currentProduct.value.precoMedio),
-      imagemUrl: currentProduct.value.imagemUrl,
+    const formData = new FormData()
+    formData.append('nome', currentProduct.value.nome)
+    formData.append('descricao', currentProduct.value.descricao)
+    formData.append('categoria', currentProduct.value.categoria)
+    formData.append('precoMedio', parseFloat(currentProduct.value.precoMedio))
+
+    if (productImageFile.value) {
+      formData.append('file', productImageFile.value)
     }
 
     if (currentProduct.value.id) {
-      await api.put(`/produtos/${currentProduct.value.id}`, payload)
+      await api.put(`/produtos/${currentProduct.value.id}`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      })
     } else {
-      await api.post('/produtos', payload)
+      if (!productImageFile.value) {
+        alert('A imagem do produto é obrigatória para criar um novo produto.')
+        return
+      }
+      await api.post('/produtos', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      })
     }
 
     isModalActive.value = false
-    await fetchProducts()
+    productImageFile.value = null
+    await Promise.all([fetchProducts(), fetchDashboardStats()])
   } catch (error) {
     console.error('Erro ao salvar produto:', error)
     alert('Erro ao salvar produto.')
@@ -95,7 +142,7 @@ const deleteProduct = async () => {
   try {
     await api.delete(`/produtos/${productToDelete.value.id}`)
     isDeleteModalActive.value = false
-    await fetchProducts()
+    await Promise.all([fetchProducts(), fetchDashboardStats()])
   } catch (error) {
     console.error('Erro ao excluir produto:', error)
     alert('Erro ao excluir produto.')
@@ -104,6 +151,7 @@ const deleteProduct = async () => {
 
 onMounted(() => {
   fetchProducts()
+  fetchDashboardStats()
 })
 </script>
 
@@ -120,6 +168,32 @@ onMounted(() => {
           @click="openModal()"
         />
       </SectionTitleLineWithButton>
+
+      <CardBox v-if="dashboardStats" class="mb-6">
+        <div class="p-4">
+          <div class="mb-2 flex items-center">
+            <BaseIcon :path="mdiDatabase" size="24" class="mr-2 text-gray-500" />
+            <h3 class="text-lg font-semibold">Uso de Armazenamento</h3>
+          </div>
+          <p class="text-sm text-gray-600">
+            Você utilizou
+            <b class="text-gray-800">{{ formatBytes(dashboardStats.storageUsado) }}</b> de
+            <b class="text-gray-800">{{ formatBytes(dashboardStats.storageLimite) }}</b>.
+            Disponível: <b class="text-emerald-600">{{ formatBytes(storageAvailable) }}</b>
+          </p>
+          <div class="mt-2 h-2 w-full rounded-full bg-gray-200">
+            <div
+              class="h-2 rounded-full"
+              :class="{
+                'bg-emerald-500': storageUsagePercent < 70,
+                'bg-yellow-500': storageUsagePercent >= 70 && storageUsagePercent < 90,
+                'bg-red-500': storageUsagePercent >= 90,
+              }"
+              :style="{ width: storageUsagePercent + '%' }"
+            ></div>
+          </div>
+        </div>
+      </CardBox>
 
       <CardBox class="mb-6" has-table>
         <div v-if="isLoading" class="p-4 text-center text-gray-500">Carregando...</div>
@@ -202,8 +276,8 @@ onMounted(() => {
         <FormControl v-model="currentProduct.precoMedio" type="number" step="0.01" />
       </FormField>
 
-      <FormField label="URL da Imagem">
-        <FormControl v-model="currentProduct.imagemUrl" placeholder="https://..." />
+      <FormField label="Imagem do Produto">
+        <FormFilePicker v-model="productImageFile" label="Selecione a imagem" />
       </FormField>
     </CardBoxModal>
 
