@@ -1,7 +1,7 @@
 ﻿<script setup>
 import { reactive, ref, onMounted } from 'vue'
 import { useAuthStore } from '@/stores/auth'
-import { mdiAccount, mdiMail, mdiAsterisk, mdiFormTextboxPassword } from '@mdi/js'
+import { mdiAccount, mdiMail, mdiAsterisk, mdiFormTextboxPassword, mdiWhatsapp, mdiMapMarker, mdiHome, mdiCity, mdiInformation } from '@mdi/js'
 import SectionMain from '@/components/SectionMain.vue'
 import CardBox from '@/components/CardBox.vue'
 import BaseDivider from '@/components/BaseDivider.vue'
@@ -22,7 +22,16 @@ const profileForm = reactive({
   nome: '',
   nomeMarca: '',
   email: '',
+  telefoneWhatsApp: '',
   sobre: '',
+  cep: '',
+  logradouro: '',
+  numero: '',
+  bairro: '',
+  cidade: '',
+  estado: '',
+  latitude: null,
+  longitude: null,
   servicosIds: [],
 })
 
@@ -47,7 +56,16 @@ const fetchProfileData = async () => {
     profileForm.nome = data.nome || ''
     profileForm.nomeMarca = data.nomeMarca || ''
     profileForm.email = data.email || ''
+    profileForm.telefoneWhatsApp = data.telefoneWhatsApp || ''
     profileForm.sobre = data.sobre || ''
+    profileForm.cep = data.cep || ''
+    profileForm.logradouro = data.logradouro || ''
+    profileForm.numero = data.numero || ''
+    profileForm.bairro = data.bairro || ''
+    profileForm.cidade = data.cidade || ''
+    profileForm.estado = data.estado || ''
+    profileForm.latitude = data.latitude || null
+    profileForm.longitude = data.longitude || null
     profileForm.servicosIds = data.servicosIds || []
 
     // Atualiza o store se necessário para manter consistência
@@ -105,6 +123,31 @@ const handleFileSelected = async (file) => {
   }
 }
 
+const fetchEndereco = async () => {
+  if (profileForm.cep?.length === 8) {
+    try {
+      const response = await fetch(`https://viacep.com.br/ws/${profileForm.cep}/json/`)
+      const data = await response.json()
+      if (!data.erro) {
+        profileForm.logradouro = data.logradouro
+        profileForm.bairro = data.bairro
+        profileForm.cidade = data.localidade
+        profileForm.estado = data.uf
+        
+        // Tentar obter geolocalização por endereço (usando OpenStreetMap/Nominatim)
+        const geoResponse = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(`${data.logradouro}, ${data.localidade}, ${data.uf}, Brasil`)}`)
+        const geoData = await geoResponse.json()
+        if (geoData && geoData.length > 0) {
+          profileForm.latitude = parseFloat(geoData[0].lat)
+          profileForm.longitude = parseFloat(geoData[0].lon)
+        }
+      }
+    } catch (error) {
+      console.error('Erro ao buscar endereço:', error)
+    }
+  }
+}
+
 const salvarPerfil = async () => {
   notification.value.show = false
   try {
@@ -115,6 +158,15 @@ const salvarPerfil = async () => {
       email: profileForm.email, 
       sobre: profileForm.sobre, 
       nomeMarca: profileForm.nomeMarca,
+      telefoneWhatsApp: profileForm.telefoneWhatsApp,
+      cep: profileForm.cep,
+      logradouro: profileForm.logradouro,
+      numero: profileForm.numero,
+      bairro: profileForm.bairro,
+      cidade: profileForm.cidade,
+      estado: profileForm.estado,
+      latitude: profileForm.latitude,
+      longitude: profileForm.longitude,
       servicosIds: profileForm.servicosIds 
     })
     notification.value = {
@@ -205,6 +257,15 @@ const salvarSenha = async () => {
               autocomplete="email"
             />
           </FormField>
+          <FormField label="Telefone WhatsApp" help="Seu número de contato principal">
+            <FormControl
+              v-model="profileForm.telefoneWhatsApp"
+              :icon="mdiWhatsapp"
+              name="whatsapp"
+              placeholder="(00) 00000-0000"
+              autocomplete="tel"
+            />
+          </FormField>
           <FormField label="Sobre a Marca" help="Conte sobre sua marca e seus serviços (máx. 500 caracteres).">
             <FormControl
               v-model="profileForm.sobre"
@@ -214,6 +275,64 @@ const salvarSenha = async () => {
               :maxlength="500"
             />
           </FormField>
+
+          <BaseDivider />
+
+          <!-- Seção de Endereço -->
+          <div class="mb-4">
+            <div class="flex items-center text-blue-600 mb-2">
+              <BaseIcon :path="mdiInformation" size="20" class="mr-2" />
+              <span class="text-sm font-semibold">Aviso de Privacidade</span>
+            </div>
+            <p class="text-xs text-gray-500 italic leading-snug">
+              Seu endereço completo não será exibido publicamente. Ele é utilizado exclusivamente para que possíveis clientes encontrem costureiras mais próximas através da localização aproximada.
+            </p>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <FormField label="CEP">
+              <FormControl
+                v-model="profileForm.cep"
+                :icon="mdiMapMarker"
+                name="cep"
+                maxlength="8"
+                placeholder="00000000"
+                @input="fetchEndereco"
+              />
+            </FormField>
+            <FormField label="Número">
+              <FormControl
+                v-model="profileForm.numero"
+                :icon="mdiHome"
+                name="numero"
+                placeholder="123"
+              />
+            </FormField>
+          </div>
+
+          <FormField label="Logradouro" help="Rua, Avenida, etc.">
+            <FormControl
+              v-model="profileForm.logradouro"
+              name="logradouro"
+              placeholder="Ex: Rua das Flores"
+            />
+          </FormField>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <FormField label="Bairro">
+              <FormControl
+                v-model="profileForm.bairro"
+                name="bairro"
+              />
+            </FormField>
+            <FormField label="Cidade">
+              <FormControl
+                v-model="profileForm.cidade"
+                :icon="mdiCity"
+                name="cidade"
+              />
+            </FormField>
+          </div>
 
           <BaseDivider />
 
