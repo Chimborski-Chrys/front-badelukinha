@@ -39,7 +39,7 @@ const servicosDisponiveis = ref({})
 
 const fetchServicosDisponiveis = async () => {
   try {
-    const { data } = await api.get('/perfil/servicos-disponiveis')
+    const { data } = await api.get('/Costureiras/servicos')
     // Converte [{id, nome}] para {id: nome}
     servicosDisponiveis.value = data.reduce((acc, curr) => {
       acc[curr.id] = curr.nome

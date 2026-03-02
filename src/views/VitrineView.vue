@@ -80,7 +80,7 @@ const fetchAvailableBrands = async () => {
 
 const fetchAvailableServices = async () => {
   try {
-    const { data } = await api.get('/perfil/servicos-disponiveis')
+    const { data } = await api.get('/Costureiras/servicos')
     availableServices.value = data
   } catch (err) {
     console.error('Erro ao buscar serviços:', err)
