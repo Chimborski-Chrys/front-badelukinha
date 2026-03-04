@@ -91,8 +91,13 @@ const handleGoogleError = () => {
 
 <template>
   <LayoutGuest>
-    <SectionFullScreen v-slot="{ cardClass }" bg="purplePink">
-      <CardBox :class="cardClass" is-form @submit.prevent="submit">
+    <SectionFullScreen v-slot="{ cardClass }" bg="slate">
+      <CardBox :class="cardClass" is-form class="rounded-3xl shadow-2xl border-none" @submit.prevent="submit">
+        <div class="text-center mb-8">
+          <h1 class="text-2xl font-black text-slate-800">Acesse sua conta</h1>
+          <p class="text-slate-500 text-sm mt-1">Gerencie seu ateliê e conecte-se com clientes.</p>
+        </div>
+
         <NotificationBar v-if="errorMessage" color="danger" :icon="mdiAlertCircle">
           {{ errorMessage }}
         </NotificationBar>

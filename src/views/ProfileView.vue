@@ -126,15 +126,18 @@ const handleFileSelected = async (file) => {
 const fetchEndereco = async () => {
   if (profileForm.cep?.length === 8) {
     try {
-      const response = await fetch(`https://viacep.com.br/ws/${profileForm.cep}/json/`)
+      // Usando fetch com modo cors explícito
+      const response = await fetch(`https://viacep.com.br/ws/${profileForm.cep}/json/`, {
+        mode: 'cors'
+      })
       const data = await response.json()
       if (!data.erro) {
         profileForm.logradouro = data.logradouro
         profileForm.bairro = data.bairro
         profileForm.cidade = data.localidade
         profileForm.estado = data.uf
-        
-        // Tentar obter geolocalização por endereço (usando OpenStreetMap/Nominatim)
+
+        // Tentar obter geolocalização por endereço
         const geoResponse = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(`${data.logradouro}, ${data.localidade}, ${data.uf}, Brasil`)}`)
         const geoData = await geoResponse.json()
         if (geoData && geoData.length > 0) {
@@ -147,7 +150,6 @@ const fetchEndereco = async () => {
     }
   }
 }
-
 const salvarPerfil = async () => {
   notification.value.show = false
   try {

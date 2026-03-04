@@ -120,7 +120,7 @@ watch(searchTermLoja, () => {
 
 <template>
   <LayoutGuest>
-    <div class="min-h-screen bg-gradient-to-b from-orange-50 via-pink-50 to-yellow-50 px-4 py-16">
+    <div class="min-h-screen bg-slate-50 px-4 py-12">
       <NotificationBar
         v-if="notification.show"
         :color="notification.color"
@@ -129,127 +129,133 @@ watch(searchTermLoja, () => {
         {{ notification.message }}
       </NotificationBar>
 
-      <CardBox v-if="isLoading" class="mb-6">
-        <p class="py-4 text-center">Carregando dados da loja...</p>
-      </CardBox>
+      <div v-if="isLoading" class="flex flex-col items-center justify-center py-20 text-slate-400">
+        <div class="animate-spin w-10 h-10 border-4 border-indigo-500 border-t-transparent rounded-full mb-4"></div>
+        <p>Carregando ateliê...</p>
+      </div>
 
-      <CardBox v-else-if="!costureira" class="mb-6">
-        <CardBoxComponentEmpty />
-        <p class="py-4 text-center">Loja não encontrada ou não é mais válida.</p>
-      </CardBox>
+      <div v-else-if="!costureira" class="max-w-2xl mx-auto text-center py-20 bg-white rounded-3xl shadow-sm border border-slate-100">
+        <BaseIcon :path="mdiTshirtCrew" size="64" class="mx-auto mb-6 text-slate-200" />
+        <h2 class="text-2xl font-bold text-slate-800 mb-2">Ateliê não encontrado</h2>
+        <p class="text-slate-500 mb-8">Este perfil pode ter sido removido ou o link está incorreto.</p>
+        <BaseButton to="/" label="Voltar para a vitrine" color="info" outline />
+      </div>
 
       <div v-else class="container mx-auto">
-        <!-- Header da Loja -->
-        <div class="mb-12 text-center">
-          <img
-            v-if="costureira.fotoPerfilUrl"
-            :src="costureira.fotoPerfilUrl"
-            alt="Foto de Perfil"
-            class="mx-auto mb-4 h-24 w-24 rounded-full object-cover"
-          />
-          <img
-            v-else-if="costureira.logoUrl"
-            :src="costureira.logoUrl"
-            alt="Logo da Marca"
-            class="mx-auto mb-4 h-24 w-24 object-contain"
-          />
-          <div
-            v-else
-            class="mx-auto mb-4 flex h-24 w-24 items-center justify-center rounded-full bg-gray-200 text-xl text-gray-500 dark:bg-slate-700 dark:text-gray-400"
-          >
-            {{ costureira.nome ? costureira.nome.charAt(0).toUpperCase() : '?' }}
+        <!-- Header da Loja: Estilo Editorial -->
+        <div class="mb-16 bg-white rounded-3xl p-8 md:p-12 shadow-sm border border-slate-100 relative overflow-hidden">
+          <!-- Decoração sutil de fundo -->
+          <div class="absolute top-0 right-0 w-64 h-64 bg-slate-50 rounded-full -mr-32 -mt-32 z-0"></div>
+          
+          <div class="relative z-10 flex flex-col md:flex-row items-center md:items-start gap-8">
+            <div class="flex-shrink-0">
+              <img
+                v-if="costureira.fotoPerfilUrl"
+                :src="costureira.fotoPerfilUrl"
+                alt="Foto de Perfil"
+                class="h-32 w-32 md:h-40 md:w-40 rounded-2xl object-cover ring-8 ring-slate-50 shadow-md"
+              />
+              <div
+                v-else
+                class="flex h-32 w-32 md:h-40 md:w-40 items-center justify-center rounded-2xl bg-slate-100 text-4xl font-bold text-slate-300"
+              >
+                {{ costureira.nome ? costureira.nome.charAt(0).toUpperCase() : '?' }}
+              </div>
+            </div>
+
+            <div class="flex-grow text-center md:text-left">
+              <div class="flex flex-col md:flex-row md:items-center gap-4 mb-4">
+                <h1 class="text-3xl md:text-4xl font-black text-slate-900 tracking-tight">
+                  {{ costureira?.nomeMarca || costureira?.nome || 'Loja' }}
+                </h1>
+                <div v-if="costureira.servicos && costureira.servicos.length > 0" class="flex flex-wrap justify-center md:justify-start gap-2">
+                  <span
+                    v-for="servico in costureira.servicos"
+                    :key="servico"
+                    class="px-2 py-0.5 bg-indigo-50 text-indigo-700 text-[10px] font-black uppercase rounded tracking-wider"
+                  >
+                    {{ servico }}
+                  </span>
+                </div>
+              </div>
+
+              <p class="text-lg text-slate-600 mb-8 max-w-2xl leading-relaxed">
+                {{ costureira.sobre || 'Nenhum detalhe adicional sobre este ateliê.' }}
+              </p>
+
+              <div class="flex flex-wrap justify-center md:justify-start gap-4">
+                <BaseButton
+                  v-if="costureira.telefoneWhatsApp"
+                  :href="`https://wa.me/55${costureira.telefoneWhatsApp.replace(/\D/g, '')}`"
+                  target="_blank"
+                  label="Contactar Ateliê"
+                  color="success"
+                  :icon="mdiWhatsapp"
+                  class="shadow-lg shadow-emerald-100 px-8"
+                />
+                <div class="flex items-center text-slate-400 text-sm px-4 border-l border-slate-100">
+                  <BaseIcon :path="mdiMapMarker" size="18" class="mr-1" />
+                  {{ costureira.bairro || 'Localização não informada' }}
+                </div>
+              </div>
+            </div>
           </div>
-
-          <h1 class="mb-4 text-4xl font-bold text-red-700 md:text-6xl">
-            {{ costureira?.nomeMarca || costureira?.nome || 'Loja' }}
-          </h1>
-          <p class="text-xl text-gray-700">
-            {{ costureira.sobre || 'Explore os produtos exclusivos desta loja.' }}
-          </p>
-
-          <!-- Tags de Serviços -->
-          <div v-if="costureira.servicos && costureira.servicos.length > 0" class="mt-4 flex flex-wrap justify-center gap-2">
-            <PillTag
-              v-for="servico in costureira.servicos"
-              :key="servico"
-              :label="servico"
-              color="info"
-              small
-            />
-          </div>
-
-          <BaseButton
-            v-if="costureira.telefoneWhatsApp"
-            :href="`https://wa.me/${costureira.telefoneWhatsApp}`"
-            target="_blank"
-            label="Conversar no WhatsApp"
-            color="success"
-            :icon="mdiWhatsapp"
-            small
-            class="mt-4"
-          />
         </div>
 
         <!-- Produtos da Loja -->
-        <div class="container mx-auto">
-          <div class="mb-6 flex items-center justify-center gap-2">
-            <FormControl
-              v-model="searchTermLoja"
-              :icon="mdiMagnify"
-              placeholder="Buscar produtos nesta loja..."
-              class="w-full md:w-1/2"
-              @keyup.enter="fetchLojaProdutos"
-            />
-            <BaseButton label="Buscar" :icon="mdiMagnify" color="info" @click="fetchLojaProdutos" />
+        <div class="space-y-10">
+          <div class="flex flex-col md:flex-row items-center justify-between gap-6 border-b border-slate-200 pb-8">
+            <h2 class="text-2xl font-bold text-slate-800">Criações e Amostras</h2>
+            
+            <div class="flex items-center gap-3 w-full md:w-auto">
+              <FormControl
+                v-model="searchTermLoja"
+                :icon="mdiMagnify"
+                placeholder="Buscar no ateliê..."
+                class="w-full md:w-64"
+                @keyup.enter="fetchLojaProdutos"
+              />
+              <BaseButton label="Buscar" color="contrast" @click="fetchLojaProdutos" />
+            </div>
           </div>
 
           <div
             v-if="lojaProdutos && lojaProdutos.length > 0"
-            class="grid grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
+            class="grid grid-cols-1 gap-10 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
           >
             <div v-for="produto in lojaProdutos" :key="produto.id" class="group">
-              <CardBox
-                class="flex h-full cursor-pointer flex-col overflow-hidden border-2 border-dashed border-red-200 bg-white/95 shadow-lg transition-all duration-500 hover:shadow-2xl"
+              <div 
+                class="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-500 border border-slate-50 cursor-pointer h-full flex flex-col"
                 @click="handleShowProductDetails(produto)"
               >
-                <div class="relative overflow-hidden">
+                <div class="relative aspect-[4/5] overflow-hidden">
                   <img
-                    :src="produto.imagemUrl || 'https://via.placeholder.com/300'"
+                    :src="produto.imagemUrl || 'https://via.placeholder.com/400'"
                     :alt="produto.nome"
-                    class="h-64 w-full object-cover transition-transform duration-700 group-hover:scale-110"
+                    class="h-full w-full object-cover transition-transform duration-1000 group-hover:scale-105"
                   />
+                  <div class="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors"></div>
                 </div>
-                <div class="flex flex-grow flex-col p-6">
-                  <PillTag
-                    :label="getCategoryLabel(produto.categoria)"
-                    color="danger"
-                    outline
-                    small
-                    class="mb-2 self-start"
-                  />
-                  <h3
-                    class="mb-2 line-clamp-2 flex-grow text-lg leading-tight font-bold text-gray-800"
-                  >
+                <div class="p-6 flex flex-col flex-grow">
+                  <span class="text-[10px] font-black uppercase tracking-widest text-indigo-600 bg-indigo-50 px-2 py-1 rounded mb-3 self-start">
+                    {{ getCategoryLabel(produto.categoria) }}
+                  </span>
+                  <h3 class="mb-4 text-lg font-bold text-slate-900 leading-tight group-hover:text-indigo-700 transition-colors">
                     {{ produto.nome }}
                   </h3>
-                  <BaseButton
-                    label="Ver Detalhes"
-                    :icon="mdiEye"
-                    color="info"
-                    outline
-                    class="mt-auto w-full rounded-lg border-2 py-2 font-semibold hover:bg-blue-50"
-                    @click.stop="handleShowProductDetails(produto)"
-                  />
+                  <div class="mt-auto flex items-center justify-between text-slate-300 group-hover:text-indigo-600 transition-colors pt-4 border-t border-slate-50">
+                    <span class="text-xs font-bold text-slate-400">Ver detalhes</span>
+                    <BaseIcon :path="mdiEye" size="18" />
+                  </div>
                 </div>
-              </CardBox>
+              </div>
             </div>
           </div>
-          <CardBox v-else>
-            <CardBoxComponentEmpty />
-            <p class="py-4 text-center">
-              Esta loja ainda não possui produtos cadastrados ou encontrados com o termo de busca.
-            </p>
-          </CardBox>
+          
+          <div v-else class="text-center py-20 bg-slate-50 rounded-3xl border-2 border-dashed border-slate-200">
+            <BaseIcon :path="mdiTag" size="48" class="mx-auto mb-4 text-slate-200" />
+            <p class="text-slate-500 font-medium">Nenhuma peça encontrada neste ateliê.</p>
+          </div>
         </div>
       </div>
     </div>
