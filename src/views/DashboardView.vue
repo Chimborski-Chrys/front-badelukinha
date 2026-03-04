@@ -74,7 +74,7 @@ const totalContatos = computed(() => {
 
 const taxaConversao = computed(() => {
   if (totalVisualizacoes.value === 0) return 0
-  return (totalContatos.value / totalVisualizacoes.value) * 100
+  return Math.ceil((totalContatos.value / totalVisualizacoes.value) * 100)
 })
 
 // --- Propriedades Computadas (Período Anterior) ---
@@ -185,7 +185,7 @@ const barChartData = computed(() => {
           color="text-red-500"
           :icon="mdiTrendingUp"
           :number="taxaConversao"
-          number-type="percent"
+          suffix="%"
           label="Taxa de Interesse"
         />
       </div>
@@ -265,26 +265,35 @@ const barChartData = computed(() => {
 
        <!-- Dicas de UX -->
        <CardBox
-          class="border border-blue-100 bg-gradient-to-r from-blue-50 to-indigo-50"
-          title="Analisando os Resultados"
+          class="border border-slate-100 bg-white shadow-sm"
+          title="Insights de Performance"
         >
-          <div class="space-y-4 text-gray-700">
-            <div class="flex gap-3">
-              <div class="h-fit rounded-full bg-blue-100 p-2 font-bold text-blue-600"><BaseIcon :path="mdiArrowUp" /></div>
-              <p>
-                <strong>Tendência de alta:</strong> Números verdes indicam que sua performance no período selecionado foi melhor que no período anterior. Ótimo trabalho!
+          <div class="space-y-6 text-slate-600">
+            <div class="flex gap-4 items-start">
+              <div class="h-8 w-8 rounded-lg bg-emerald-50 flex items-center justify-center text-emerald-600 flex-shrink-0">
+                <BaseIcon :path="mdiArrowUp" size="18" />
+              </div>
+              <p class="text-sm">
+                <strong class="text-slate-900 block mb-1">Crescimento Identificado:</strong> 
+                Números em verde indicam que sua performance superou o período anterior. Isso reflete um maior interesse em suas peças.
               </p>
             </div>
-            <div class="flex gap-3">
-              <div class="h-fit rounded-full bg-blue-100 p-2 font-bold text-blue-600"><BaseIcon :path="mdiArrowDown" /></div>
-              <p>
-                <strong>Tendência de baixa:</strong> Números vermelhos indicam uma queda. Analise o que pode ter mudado. Você divulgou menos? A qualidade da foto de um produto novo não está tão boa?
+            <div class="flex gap-4 items-start">
+              <div class="h-8 w-8 rounded-lg bg-rose-50 flex items-center justify-center text-rose-600 flex-shrink-0">
+                <BaseIcon :path="mdiArrowDown" size="18" />
+              </div>
+              <p class="text-sm">
+                <strong class="text-slate-900 block mb-1">Atenção Necessária:</strong> 
+                Números em vermelho indicam uma oscilação negativa. Verifique se fotos novas ou descrições mais detalhadas podem ajudar a reverter a tendência.
               </p>
             </div>
-             <div class="flex gap-3">
-              <div class="h-fit rounded-full bg-blue-100 p-2 font-bold text-blue-600">?</div>
-              <p>
-                <strong>Muitas visualizações e poucos contatos?</strong> Talvez sua descrição não esteja clara ou o preço médio esteja fora da expectativa. Tente adicionar mais detalhes ou ajustar o valor.
+             <div class="flex gap-4 items-start">
+              <div class="h-8 w-8 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-600 flex-shrink-0">
+                <BaseIcon :path="mdiTrendingUp" size="18" />
+              </div>
+              <p class="text-sm">
+                <strong class="text-slate-900 block mb-1">Otimização de Conversão:</strong> 
+                Muitas visualizações e poucos contatos? Experimente atualizar os detalhes técnicos das peças ou destacar se faz sob medida.
               </p>
             </div>
           </div>

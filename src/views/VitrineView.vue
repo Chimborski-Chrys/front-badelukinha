@@ -107,7 +107,9 @@ const fetchNearbyCostureiras = async () => {
   if (visitorCep.value?.length === 8) {
     isSearchingNearby.value = true
     try {
-      const cepResponse = await fetch(`https://viacep.com.br/ws/${visitorCep.value}/json/`)
+      const cepResponse = await fetch(`https://viacep.com.br/ws/${visitorCep.value}/json/`, {
+        mode: 'cors'
+      })
       const cepData = await cepResponse.json()
       if (cepData.erro) throw new Error('CEP não encontrado.')
 
@@ -196,38 +198,44 @@ const pageSubtitle = computed(() => 'Explore criações únicas, feitas à mão 
 
 <template>
   <LayoutGuest>
-    <div class="min-h-screen bg-gradient-to-b from-orange-50 via-pink-50 to-yellow-50 px-4 py-16">
+    <div class="min-h-screen bg-slate-50 px-4 py-12">
       <div class="container mx-auto">
-        <!-- Header -->
-        <div class="mb-12 text-center">
-          <h1 class="mb-4 text-4xl font-bold text-red-700 md:text-6xl">{{ pageTitle }}</h1>
-          <p class="text-xl text-gray-700">{{ pageSubtitle }}</p>
+        <!-- Header / Hero Section -->
+        <div class="mb-16 text-center max-w-3xl mx-auto">
+          <h1 class="mb-6 text-4xl font-extrabold text-slate-900 md:text-5xl tracking-tight">
+            {{ pageTitle }}
+          </h1>
+          <p class="text-lg text-slate-600 leading-relaxed font-light">
+            Conectamos você aos melhores profissionais da costura e alfaiataria. 
+            Peças sob medida, ajustes e criações exclusivas para todos os estilos.
+          </p>
         </div>
 
-        <div class="flex flex-col gap-8 md:flex-row">
-          <!-- Sidebar -->
-          <aside class="w-full md:w-1/4 lg:w-1/5">
+        <div class="flex flex-col gap-10 md:flex-row">
+          <!-- Sidebar: Filtros Refinados -->
+          <aside class="w-full md:w-1/4 lg:w-1/5 space-y-8">
             <!-- CEP Filter -->
-            <CardBox class="p-4 mb-6">
-              <h2 class="mb-4 text-lg font-semibold flex items-center">
-                <BaseIcon :path="mdiMapMarker" class="mr-2 text-red-600" />
-                Proximidade
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
+              <h2 class="mb-4 text-sm font-bold uppercase tracking-wider text-slate-500 flex items-center">
+                <BaseIcon :path="mdiMapMarker" class="mr-2 text-indigo-600" />
+                Localização
               </h2>
               <FormControl
                 v-model="visitorCep"
                 placeholder="Seu CEP"
                 maxlength="8"
+                class="bg-slate-50 border-none"
                 @input="fetchNearbyCostureiras"
               />
-            </CardBox>
+            </div>
 
             <!-- Services Filter -->
-            <CardBox class="p-4 mb-6">
-              <h2 class="mb-4 text-lg font-semibold flex items-center">
-                <BaseIcon :path="mdiAccountHeart" class="mr-2 text-blue-600" />
-                Serviços
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
+              <h2 class="mb-4 text-sm font-bold uppercase tracking-wider text-slate-500 flex items-center">
+                <BaseIcon :path="mdiAccountHeart" class="mr-2 text-indigo-600" />
+                Especialidades
               </h2>
-              <div class="flex flex-col gap-2">
+              <div class="flex flex-col gap-3">
                 <FormCheckRadio
                   v-for="service in availableServices"
                   :key="service.id"
@@ -236,14 +244,15 @@ const pageSubtitle = computed(() => 'Explore criações únicas, feitas à mão 
                   :label="service.nome"
                   name="services"
                   type="checkbox"
+                  class="text-sm"
                 />
               </div>
-            </CardBox>
+            </div>
 
             <!-- Brand Filter -->
-            <CardBox class="p-4">
-              <h2 class="mb-4 text-lg font-semibold">Marcas</h2>
-              <div class="flex flex-col gap-2 max-h-60 overflow-y-auto">
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
+              <h2 class="mb-4 text-sm font-bold uppercase tracking-wider text-slate-500">Ateliês</h2>
+              <div class="flex flex-col gap-3 max-h-60 overflow-y-auto pr-2 custom-scrollbar">
                 <FormCheckRadio
                   v-for="brand in availableBrands"
                   :key="brand"
@@ -252,91 +261,124 @@ const pageSubtitle = computed(() => 'Explore criações únicas, feitas à mão 
                   :label="brand"
                   name="brands"
                   type="checkbox"
+                  class="text-sm"
                 />
               </div>
-            </CardBox>
+            </div>
           </aside>
 
           <!-- Main Content -->
           <main class="flex-1">
-            <!-- Search -->
-            <div class="mb-8 flex items-center gap-2">
-              <FormControl
-                v-model="searchTerm"
-                :icon="mdiMagnify"
-                placeholder="Buscar por produto..."
-                class="flex-grow"
-                @keyup.enter="performSearch"
-              />
-              <BaseButton label="Buscar" :icon="mdiMagnify" color="info" @click="performSearch" />
+            <!-- Search Bar -->
+            <div class="mb-10 flex items-center gap-3">
+              <div class="relative flex-grow group">
+                <FormControl
+                  v-model="searchTerm"
+                  :icon="mdiMagnify"
+                  placeholder="Busque por tipo de peça ou serviço..."
+                  class="w-full"
+                  @keyup.enter="performSearch"
+                />
+              </div>
+              <BaseButton label="Buscar" color="contrast" class="px-8 shadow-md" @click="performSearch" />
             </div>
 
-            <!-- Seção de Profissionais (Proximidade ou Serviço) -->
-            <div v-if="proximasCostureiras.length > 0 || costureirasPorServico.length > 0" class="mb-12">
-              <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
-                <BaseIcon :path="mdiAccountHeart" class="mr-2 text-red-600" />
-                Costureiras Encontradas
+            <!-- Seção de Profissionais em Destaque -->
+            <div v-if="proximasCostureiras.length > 0 || costureirasPorServico.length > 0" class="mb-16">
+              <h2 class="text-xl font-bold text-slate-800 mb-8 flex items-center">
+                <span class="w-8 h-px bg-slate-300 mr-4"></span>
+                Profissionais Recomendados
               </h2>
-              <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <!-- Se for proximidade, prioriza as próximas -->
-                <CardBox 
+              <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
+                <div 
                   v-for="item in (proximasCostureiras.length > 0 ? proximasCostureiras.map(p => ({...p.costureira, distancia: p.distancia})) : costureirasPorServico)" 
                   :key="item.id"
-                  class="border-l-4 border-red-500 shadow-md hover:shadow-xl transition-shadow duration-300"
+                  class="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm hover:shadow-md transition-all duration-300"
                 >
-                  <div class="flex items-center gap-4 mb-4">
-                    <img :src="item.fotoPerfilUrl || 'https://via.placeholder.com/50'" class="w-12 h-12 rounded-full object-cover border-2 border-red-100" />
-                    <div>
-                      <h3 class="font-bold text-gray-800">{{ item.nomeMarca || item.nome }}</h3>
-                      <p v-if="item.distancia" class="text-xs font-semibold text-red-600">{{ item.distancia.toFixed(1) }} km de distância</p>
-                      <p v-else class="text-xs text-gray-500">{{ item.bairro }}, {{ item.cidade }}</p>
+                  <div class="flex items-start gap-5 mb-6">
+                    <img :src="item.fotoPerfilUrl || 'https://via.placeholder.com/60'" class="w-16 h-16 rounded-2xl object-cover ring-4 ring-slate-50 shadow-sm" />
+                    <div class="flex-grow">
+                      <h3 class="font-bold text-lg text-slate-900 leading-tight">{{ item.nomeMarca || item.nome }}</h3>
+                      <p v-if="item.distancia" class="text-xs font-bold text-indigo-600 mt-1 uppercase tracking-tight">
+                        A {{ item.distancia.toFixed(1) }} km de você
+                      </p>
+                      <p v-else class="text-xs text-slate-500 mt-1">{{ item.bairro }}, {{ item.cidade }}</p>
                     </div>
                   </div>
-                  <div class="flex flex-wrap gap-1 mb-3">
-                    <PillTag v-for="s in item.servicos" :key="s" :label="s" color="info" outline small />
+                  <div class="flex flex-wrap gap-2 mb-6">
+                    <span v-for="s in item.servicos" :key="s" class="px-2 py-1 bg-slate-50 text-slate-600 text-[10px] font-bold uppercase rounded border border-slate-100">
+                      {{ s }}
+                    </span>
                   </div>
-                  <div class="flex gap-2">
-                    <BaseButton label="Contactar" :icon="mdiWhatsapp" color="success" small @click="contactSeamstress(item)" />
-                    <BaseButton :to="{ name: 'loja', params: { marca: item.nomeMarca } }" label="Ver Loja" :icon="mdiEye" color="info" outline small />
+                  <div class="flex gap-3">
+                    <BaseButton label="WhatsApp" :icon="mdiWhatsapp" color="success" small class="flex-grow" @click="contactSeamstress(item)" />
+                    <BaseButton :to="{ name: 'loja', params: { marca: item.nomeMarca } }" label="Ver Perfil" :icon="mdiEye" color="info" outline small class="flex-grow" />
                   </div>
-                </CardBox>
+                </div>
               </div>
             </div>
 
-            <!-- Categories -->
-            <div class="mb-8 flex flex-wrap justify-center gap-2">
-              <PillTag
+            <!-- Filtro de Categorias Rápido -->
+            <div class="mb-10 flex flex-wrap gap-3 items-center">
+              <span class="text-xs font-bold text-slate-400 uppercase mr-2">Filtrar por:</span>
+              <button
                 v-for="cat in categories"
                 :key="cat"
-                :label="categoryMap[cat].label"
-                :icon="categoryMap[cat].icon"
-                :color="activeCategory === cat ? 'danger' : 'contrast'"
-                :outline="activeCategory !== cat"
-                class="cursor-pointer transition-all duration-300"
+                class="px-5 py-2 rounded-full text-xs font-bold transition-all duration-200"
+                :class="activeCategory === cat ? 'bg-slate-900 text-white shadow-lg' : 'bg-white text-slate-600 border border-slate-200 hover:border-slate-400'"
                 @click="activeCategory = cat"
-              />
+              >
+                {{ getCategoryLabel(cat) }}
+              </button>
             </div>
 
-            <!-- Products -->
-            <div v-if="loading" class="py-10 text-center"><p>Carregando...</p></div>
-            <div v-else-if="filteredProdutos.length > 0" class="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
-              <div v-for="produto in filteredProdutos" :key="produto.id" class="group">
-                <CardBox class="flex h-full cursor-pointer flex-col overflow-hidden border-2 border-dashed border-red-200 bg-white/95 shadow-lg transition-all duration-500 hover:shadow-2xl" @click="openModal(produto)">
-                  <div class="relative overflow-hidden">
-                    <img :src="produto.imagemUrl || 'https://via.placeholder.com/300'" class="h-64 w-full object-cover transition-transform duration-700 group-hover:scale-110" />
-                  </div>
-                  <div class="flex flex-grow flex-col p-6">
-                    <PillTag :label="getCategoryLabel(produto.categoria)" color="danger" outline small class="mb-2 self-start" />
-                    <h3 class="mb-2 line-clamp-2 flex-grow text-lg font-bold leading-tight text-gray-800">{{ produto.nome }}</h3>
-                    <router-link v-if="produto?.usuario?.nomeMarca" :to="{ name: 'loja', params: { marca: produto.usuario.nomeMarca } }" class="text-sm text-gray-500 hover:text-blue-600 mb-4" @click.stop>
-                      Por: {{ produto.usuario.nomeMarca }}
-                    </router-link>
-                    <BaseButton label="Ver Detalhes" :icon="mdiEye" color="info" outline class="mt-auto w-full" @click.stop="openModal(produto)" />
-                  </div>
-                </CardBox>
+            <!-- Galeria de Peças -->
+            <div v-if="loading" class="py-20 text-center text-slate-400">
+              <div class="animate-pulse flex flex-col items-center">
+                <div class="w-12 h-12 bg-slate-200 rounded-full mb-4"></div>
+                <p>Buscando inspirações...</p>
               </div>
             </div>
-            <div v-else class="py-10 text-center"><p>Nenhum resultado encontrado.</p></div>
+            
+            <div v-else-if="filteredProdutos.length > 0" class="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-3">
+              <div v-for="produto in filteredProdutos" :key="produto.id" class="group">
+                <div class="relative bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-500 border border-slate-50 h-full flex flex-col" @click="openModal(produto)">
+                  <div class="relative aspect-[4/5] overflow-hidden">
+                    <img :src="produto.imagemUrl || 'https://via.placeholder.com/400'" class="h-full w-full object-cover transition-transform duration-1000 group-hover:scale-105" />
+                    <div class="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-500"></div>
+                  </div>
+                  
+                  <div class="p-6 flex flex-col flex-grow">
+                    <div class="flex justify-between items-start mb-3">
+                      <span class="text-[10px] font-black uppercase tracking-widest text-indigo-600 bg-indigo-50 px-2 py-1 rounded">
+                        {{ getCategoryLabel(produto.categoria) }}
+                      </span>
+                    </div>
+                    <h3 class="mb-4 text-lg font-bold text-slate-900 leading-tight group-hover:text-indigo-700 transition-colors">
+                      {{ produto.nome }}
+                    </h3>
+                    
+                    <div class="mt-auto pt-4 border-t border-slate-50 flex items-center justify-between">
+                      <router-link 
+                        v-if="produto?.usuario?.nomeMarca" 
+                        :to="{ name: 'loja', params: { marca: produto.usuario.nomeMarca } }" 
+                        class="text-xs font-bold text-slate-500 hover:text-indigo-600 flex items-center" 
+                        @click.stop
+                      >
+                        <BaseIcon :path="mdiTshirtCrew" size="14" class="mr-1" />
+                        {{ produto.usuario.nomeMarca }}
+                      </router-link>
+                      <BaseIcon :path="mdiEye" size="18" class="text-slate-300 group-hover:text-indigo-600 transition-colors" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div v-else class="py-20 text-center border-2 border-dashed border-slate-200 rounded-3xl">
+              <p class="text-slate-500 font-medium">Nenhuma peça ou serviço encontrado nesta seleção.</p>
+              <BaseButton label="Ver todos" color="info" outline class="mt-4" @click="activeCategory = 'todos'; searchTerm = ''; selectedBrands = []; selectedServices = []" />
+            </div>
           </main>
         </div>
       </div>

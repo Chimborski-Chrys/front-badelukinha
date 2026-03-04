@@ -7,16 +7,14 @@ const year = new Date().getFullYear()
 </script>
 
 <template>
-  <footer class="px-6 py-2" :class="containerMaxW">
+  <footer class="px-6 py-8 mt-12 border-t border-slate-100" :class="containerMaxW">
     <BaseLevel>
-      <div class="text-center md:text-left">
-        <b>&copy;{{ year }}, <a href="https://justboil.me/" target="_blank">JustBoil.me</a>.</b>
-        <slot />
+      <div class="text-center md:text-left text-slate-500 text-sm">
+        <b>&copy; {{ year }} Ateliê Virtual.</b>
+        <span class="ml-2 font-light">Conectando talentos da costura a você.</span>
       </div>
-      <div class="md:py-2">
-        <a href="https://justboil.me">
-          <JustboilLogo class="h-8 w-auto md:h-6" />
-        </a>
+      <div class="md:py-2 text-slate-400 font-black tracking-widest text-xs uppercase">
+        Feito à mão
       </div>
     </BaseLevel>
   </footer>
