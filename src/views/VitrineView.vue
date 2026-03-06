@@ -358,6 +358,12 @@ const pageSubtitle = computed(() => 'Explore criações únicas, feitas à mão 
                       {{ produto.nome }}
                     </h3>
                     
+                    <div v-if="produto.tamanhos?.length > 0" class="flex flex-wrap gap-1 mb-4">
+                      <span v-for="t in produto.tamanhos" :key="t" class="px-2 py-0.5 bg-slate-50 text-slate-500 text-[10px] font-bold rounded border border-slate-100">
+                        {{ t }}
+                      </span>
+                    </div>
+
                     <div class="mt-auto pt-4 border-t border-slate-50 flex items-center justify-between">
                       <router-link 
                         v-if="produto?.usuario?.nomeMarca" 

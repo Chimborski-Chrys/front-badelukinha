@@ -134,6 +134,20 @@ window.addEventListener('keydown', (e) => {
             <h3 class="mb-2 text-xs font-bold tracking-wide text-gray-400 uppercase">Descrição</h3>
             <p class="whitespace-pre-line">{{ produto?.descricao }}</p>
           </div>
+
+          <div v-if="produto?.tamanhos?.length > 0" class="mb-4">
+            <h3 class="mb-2 text-xs font-bold tracking-wide text-gray-400 uppercase">Tamanhos Disponíveis</h3>
+            <div class="flex flex-wrap gap-2">
+              <PillTag
+                v-for="tamanho in produto.tamanhos"
+                :key="tamanho"
+                :label="tamanho"
+                color="info"
+                outline
+                small
+              />
+            </div>
+          </div>
         </div>
 
         <!-- Fixed Footer Area -->

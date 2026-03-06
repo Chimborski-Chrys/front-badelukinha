@@ -11,6 +11,7 @@ import CardBoxModal from '@/components/CardBoxModal.vue'
 import FormField from '@/components/FormField.vue'
 import FormControl from '@/components/FormControl.vue'
 import FormFilePicker from '@/components/FormFilePicker.vue'
+import FormCheckRadioGroup from '@/components/FormCheckRadioGroup.vue'
 import PillTag from '@/components/PillTag.vue'
 import api from '@/services/api'
 
@@ -29,12 +30,27 @@ const categories = [
   { id: 'outros', label: 'Outros' },
 ]
 
+const sizesOptions = {
+  1: '1',
+  2: '2',
+  4: '4',
+  6: '6',
+  8: '8',
+  10: '10',
+  12: '12',
+  14: '14',
+  16: '16',
+  18: '18',
+  20: '20',
+}
+
 const defaultProduct = {
   id: null,
   nome: '',
   descricao: '',
   categoria: 'vestido',
   precoMedio: 0,
+  tamanhos: [],
 }
 
 const currentProduct = ref({ ...defaultProduct })
@@ -84,9 +100,13 @@ const storageAvailable = computed(() => {
 
 const openModal = (product = null) => {
   if (product) {
-    currentProduct.value = { ...product, precoMedio: product.precoMedio || 0 }
+    currentProduct.value = {
+      ...product,
+      precoMedio: product.precoMedio || 0,
+      tamanhos: product.tamanhos || [],
+    }
   } else {
-    currentProduct.value = { ...defaultProduct }
+    currentProduct.value = { ...defaultProduct, tamanhos: [] }
   }
   productImageFile.value = null
   isModalActive.value = true
@@ -104,6 +124,13 @@ const submitProduct = async () => {
     formData.append('descricao', currentProduct.value.descricao)
     formData.append('categoria', currentProduct.value.categoria)
     formData.append('precoMedio', parseFloat(currentProduct.value.precoMedio))
+
+    // Append cada tamanho individualmente para o backend receber como List<string>
+    if (currentProduct.value.tamanhos && currentProduct.value.tamanhos.length > 0) {
+      currentProduct.value.tamanhos.forEach((size) => {
+        formData.append('tamanhos', size)
+      })
+    }
 
     if (productImageFile.value) {
       formData.append('file', productImageFile.value)
@@ -274,6 +301,14 @@ onMounted(() => {
 
       <FormField label="Preço Médio (R$)">
         <FormControl v-model="currentProduct.precoMedio" type="number" step="0.01" />
+      </FormField>
+
+      <FormField label="Tamanhos Disponíveis" help="Selecione os tamanhos que você produz para este item">
+        <FormCheckRadioGroup
+          v-model="currentProduct.tamanhos"
+          name="tamanhos"
+          :options="sizesOptions"
+        />
       </FormField>
 
       <FormField label="Imagem do Produto">
