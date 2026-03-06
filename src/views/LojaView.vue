@@ -243,6 +243,11 @@ watch(searchTermLoja, () => {
                   <h3 class="mb-4 text-lg font-bold text-slate-900 leading-tight group-hover:text-indigo-700 transition-colors">
                     {{ produto.nome }}
                   </h3>
+                  <div v-if="produto.tamanhos?.length > 0" class="flex flex-wrap gap-1 mb-4">
+                    <span v-for="t in produto.tamanhos" :key="t" class="px-2 py-0.5 bg-slate-50 text-slate-500 text-[10px] font-bold rounded border border-slate-100">
+                      {{ t }}
+                    </span>
+                  </div>
                   <div class="mt-auto flex items-center justify-between text-slate-300 group-hover:text-indigo-600 transition-colors pt-4 border-t border-slate-50">
                     <span class="text-xs font-bold text-slate-400">Ver detalhes</span>
                     <BaseIcon :path="mdiEye" size="18" />
