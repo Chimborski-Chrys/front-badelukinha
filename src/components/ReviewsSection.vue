@@ -157,6 +157,11 @@ onMounted(() => {
         <div class="flex flex-col items-center md:items-start space-y-2">
           <p class="text-xs text-gray-500 mb-2">Clique abaixo para enviar usando sua conta Google:</p>
           <GoogleSignInButton
+            type="standard"
+            theme="outline"
+            size="large"
+            text="signin_with"
+            shape="rectangular"
             @success="handleGoogleSuccess"
             @error="handleGoogleError"
           />

@@ -9,6 +9,7 @@ import PillTag from '@/components/PillTag.vue'
 import ProductModal from '@/components/ProductModal.vue'
 import FormControl from '@/components/FormControl.vue' // Importar FormControl
 import ReviewsSection from '@/components/ReviewsSection.vue' // Importar o novo componente de avaliações
+import NotificationBar from '@/components/NotificationBar.vue'
 import api from '@/services/api'
 import { mdiWhatsapp, mdiLayers, mdiTag, mdiStar, mdiTshirtCrew, mdiEye, mdiMagnify, mdiMapMarker, mdiArrowLeft } from '@mdi/js' // Adicionar mdiMagnify, mdiArrowLeft
 

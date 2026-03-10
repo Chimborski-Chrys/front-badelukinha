@@ -147,6 +147,11 @@ const handleGoogleError = () => {
 
             <div class="flex justify-center">
               <GoogleSignInButton
+                type="standard"
+                theme="outline"
+                size="large"
+                text="signin_with"
+                shape="rectangular"
                 @success="handleGoogleSuccess"
                 @error="handleGoogleError"
               />
