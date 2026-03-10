@@ -71,7 +71,7 @@ const menuClick = (event, item) => {
 
   if (item.isLogout) {
     authStore.clearAuth()
-    router.push('/login')
+    router.push('/')
   }
 }
 </script>

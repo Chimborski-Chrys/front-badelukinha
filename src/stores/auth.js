@@ -35,6 +35,8 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   const isSuperAdmin = computed(() => user.value?.isSuperAdmin === true)
+  const isCostureira = computed(() => user.value?.isCostureira === true || isSuperAdmin.value)
+  const isClient = computed(() => isAuthenticated.value && !isCostureira.value && !isSuperAdmin.value)
 
   function updateUser(payload) {
     if (user.value) {
