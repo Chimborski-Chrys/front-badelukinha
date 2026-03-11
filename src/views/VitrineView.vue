@@ -437,13 +437,11 @@ const pageSubtitle = computed(() => 'Explore criações únicas, feitas à mão 
               <div
                 v-for="produto in filteredProdutos"
                 :key="produto.id"
-                class="group relative flex h-full flex-col overflow-hidden rounded-3xl border border-slate-50 bg-white shadow-sm transition-all duration-500 hover:shadow-xl"
+                class="group relative flex h-full cursor-pointer flex-col overflow-hidden rounded-3xl border border-slate-50 bg-white shadow-sm transition-all duration-500 hover:shadow-xl"
+                @click="openModal(produto)"
               >
                 <!-- Imagem -->
-                <div
-                  class="relative aspect-[4/5] cursor-pointer overflow-hidden"
-                  @click="openModal(produto)"
-                >
+                <div class="relative aspect-[4/5] overflow-hidden">
                   <img
                     :src="produto.imagemUrl || 'https://via.placeholder.com/400'"
                     :alt="produto.nome"
@@ -452,71 +450,43 @@ const pageSubtitle = computed(() => 'Explore criações únicas, feitas à mão 
                   <div
                     class="absolute inset-0 bg-black/0 transition-colors group-hover:bg-black/5"
                   ></div>
-                  <div
-                    class="absolute top-4 right-4 translate-y-2 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100"
-                  >
-                    <div class="rounded-xl bg-white/90 p-2 shadow-lg backdrop-blur">
-                      <BaseIcon :path="mdiEye" class="text-indigo-600" />
-                    </div>
-                  </div>
                 </div>
 
                 <!-- Info -->
                 <div class="flex flex-grow flex-col p-6">
-                  <div class="mb-3 flex items-center justify-between">
+                  <div class="mb-3">
                     <span
                       class="rounded bg-indigo-50 px-2 py-1 text-[10px] font-black tracking-widest text-indigo-600 uppercase"
                     >
                       {{ getCategoryLabel(produto.categoria) }}
                     </span>
-                    <span class="text-sm font-black text-slate-900">
-                      R$
-                      {{ produto.precoMedio.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}
-                    </span>
                   </div>
 
                   <h3
-                    class="mb-2 text-lg leading-tight font-bold text-slate-900 transition-colors group-hover:text-indigo-700"
+                    class="mb-4 text-lg leading-tight font-bold text-slate-900 transition-colors group-hover:text-indigo-700"
                   >
                     {{ produto.nome }}
                   </h3>
 
-                  <p class="mb-6 line-clamp-2 text-sm font-light text-slate-500">
-                    {{ produto.descricao }}
-                  </p>
-
                   <div
                     class="mt-auto flex items-center justify-between border-t border-slate-50 pt-6"
                   >
-                    <router-link
-                      v-if="produto.usuario?.nomeMarca"
-                      :to="`/loja/${produto.usuario.nomeMarca}`"
-                      class="group/brand flex items-center gap-2 transition-colors hover:text-indigo-600"
-                    >
+                    <div class="flex items-center gap-2">
                       <img
                         :src="produto.usuario?.fotoPerfilUrl || 'https://via.placeholder.com/30'"
-                        class="h-8 w-8 rounded-full object-cover shadow-sm ring-2 ring-white transition-all group-hover/brand:ring-indigo-100"
+                        class="h-7 w-7 rounded-full object-cover shadow-sm ring-2 ring-white"
                       />
-                      <span
-                        class="text-xs font-bold text-slate-600 group-hover/brand:text-indigo-600"
-                        >{{ produto.usuario?.nomeMarca || 'Ateliê' }}</span
-                      >
-                    </router-link>
-                    <div v-else class="flex items-center gap-2">
-                      <img
-                        src="https://via.placeholder.com/30"
-                        class="h-8 w-8 rounded-full object-cover shadow-sm ring-2 ring-white"
-                      />
-                      <span class="text-xs font-bold text-slate-600">Ateliê</span>
+                      <span class="text-xs font-bold text-slate-600">{{
+                        produto.usuario?.nomeMarca || 'Ateliê'
+                      }}</span>
                     </div>
-                    <BaseButton
-                      :icon="mdiWhatsapp"
-                      color="success"
-                      small
-                      outline
-                      class="flex h-10 w-10 items-center justify-center rounded-full border-emerald-100 p-0 hover:bg-emerald-50"
-                      @click="contactSeamstress(produto.usuario)"
-                    />
+
+                    <div
+                      class="flex items-center text-slate-300 transition-colors group-hover:text-indigo-600"
+                    >
+                      <span class="mr-1 text-xs font-bold text-slate-400">Ver detalhes</span>
+                      <BaseIcon :path="mdiEye" size="18" />
+                    </div>
                   </div>
                 </div>
               </div>

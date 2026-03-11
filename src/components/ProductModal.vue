@@ -119,12 +119,12 @@ window.addEventListener('keydown', (e) => {
               <router-link
                 v-if="produto?.usuario?.nomeMarca"
                 :to="{ name: 'loja', params: { marca: produto.usuario.nomeMarca } }"
-                class="cursor-pointer font-bold text-red-600 transition-colors hover:text-red-800 hover:underline"
+                class="cursor-pointer font-bold text-indigo-600 transition-colors hover:text-indigo-800 hover:underline"
                 @click="close"
               >
                 {{ produto?.usuario?.nomeMarca || produto?.usuario?.nome || 'Ateliê Virtual' }}
               </router-link>
-              <span v-else class="font-bold text-red-600">
+              <span v-else class="font-bold text-indigo-600">
                 {{ produto?.usuario?.nomeMarca || produto?.usuario?.nome || 'Ateliê Virtual' }}
               </span>
             </div>
@@ -157,7 +157,7 @@ window.addEventListener('keydown', (e) => {
               <p class="text-[10px] font-bold tracking-wider text-gray-500 uppercase">
                 A partir de
               </p>
-              <span class="text-2xl font-bold text-red-700">{{ formattedPrice }}</span>
+              <span class="text-2xl font-bold text-slate-900">{{ formattedPrice }}</span>
             </div>
 
             <BaseButton
