@@ -8,8 +8,10 @@ import BaseButton from '@/components/BaseButton.vue'
 import PillTag from '@/components/PillTag.vue'
 import ProductModal from '@/components/ProductModal.vue'
 import FormControl from '@/components/FormControl.vue' // Importar FormControl
+import ReviewsSection from '@/components/ReviewsSection.vue' // Importar o novo componente de avaliações
+import NotificationBar from '@/components/NotificationBar.vue'
 import api from '@/services/api'
-import { mdiWhatsapp, mdiLayers, mdiTag, mdiStar, mdiTshirtCrew, mdiEye, mdiMagnify } from '@mdi/js' // Adicionar mdiMagnify
+import { mdiWhatsapp, mdiLayers, mdiTag, mdiStar, mdiTshirtCrew, mdiEye, mdiMagnify, mdiMapMarker, mdiArrowLeft } from '@mdi/js' // Adicionar mdiMagnify, mdiArrowLeft
 
 const route = useRoute()
 const costureira = ref(null)
@@ -142,6 +144,19 @@ watch(searchTermLoja, () => {
       </div>
 
       <div v-else class="container mx-auto">
+        <!-- Botão Voltar para a Vitrine -->
+        <div class="mb-6 flex justify-start">
+          <BaseButton
+            to="/"
+            :icon="mdiArrowLeft"
+            label="Voltar para a Vitrine"
+            color="white"
+            class="text-slate-600 hover:text-indigo-600 transition-colors shadow-sm"
+            rounded-full
+            small
+          />
+        </div>
+
         <!-- Header da Loja: Estilo Editorial -->
         <div class="mb-16 bg-white rounded-3xl p-8 md:p-12 shadow-sm border border-slate-100 relative overflow-hidden">
           <!-- Decoração sutil de fundo -->
@@ -261,6 +276,11 @@ watch(searchTermLoja, () => {
             <BaseIcon :path="mdiTag" size="48" class="mx-auto mb-4 text-slate-200" />
             <p class="text-slate-500 font-medium">Nenhuma peça encontrada neste ateliê.</p>
           </div>
+        </div>
+
+        <!-- Avaliações dos Clientes -->
+        <div v-if="costureira" class="mt-20 border-t border-slate-100 pt-16">
+          <ReviewsSection :costureira-id="costureira.id" />
         </div>
       </div>
     </div>

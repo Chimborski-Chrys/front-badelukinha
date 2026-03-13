@@ -46,9 +46,11 @@ const submit = async () => {
 
     // Redirecionamento condicional
     if (authStore.isSuperAdmin) {
-      router.push('/admin/dashboard') // Nova rota para o super admin
+      router.push('/admin/dashboard') 
+    } else if (authStore.isCostureira) {
+      router.push('/dashboard') 
     } else {
-      router.push('/dashboard') // Rota para o dashboard da costureira
+      router.push('/') // Clientes vão para a Vitrine
     }
   } catch (error) {
     console.error('Falha no login:', error)
@@ -70,8 +72,10 @@ const handleGoogleSuccess = async (response) => {
     
     if (authStore.isSuperAdmin) {
       router.push('/admin/dashboard')
-    } else {
+    } else if (authStore.isCostureira) {
       router.push('/dashboard')
+    } else {
+      router.push('/')
     }
   } catch (error) {
     console.error('Falha no login Google:', error)
@@ -143,6 +147,11 @@ const handleGoogleError = () => {
 
             <div class="flex justify-center">
               <GoogleSignInButton
+                type="standard"
+                theme="outline"
+                size="large"
+                text="signin_with"
+                shape="rectangular"
                 @success="handleGoogleSuccess"
                 @error="handleGoogleError"
               />
