@@ -34,7 +34,7 @@ const formattedPrice = computed(() => {
 const whatsappUrl = computed(() => {
   if (!props.produto) return '#'
   const phoneNumber = props.produto.usuario?.telefoneWhatsApp || '5541996147079'
-  const message = `Olá! Vi o produto "${props.produto.nome}" no Ateliê Virtual e gostaria de solicitar um orçamento.`
+  const message = `Olá! Vi o produto "${props.produto.nome}" no Badelukinha e gostaria de solicitar um orçamento.`
   return `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`
 })
 
@@ -122,10 +122,10 @@ window.addEventListener('keydown', (e) => {
                 class="cursor-pointer font-bold text-indigo-600 transition-colors hover:text-indigo-800 hover:underline"
                 @click="close"
               >
-                {{ produto?.usuario?.nomeMarca || produto?.usuario?.nome || 'Ateliê Virtual' }}
+                {{ produto?.usuario?.nomeMarca || produto?.usuario?.nome || 'Badelukinha' }}
               </router-link>
               <span v-else class="font-bold text-indigo-600">
-                {{ produto?.usuario?.nomeMarca || produto?.usuario?.nome || 'Ateliê Virtual' }}
+                {{ produto?.usuario?.nomeMarca || produto?.usuario?.nome || 'Badelukinha' }}
               </span>
             </div>
           </div>

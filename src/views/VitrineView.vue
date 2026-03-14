@@ -75,7 +75,7 @@ const fetchAvailableBrands = async () => {
     const response = await api.get('/Costureiras/marcas')
     // A API agora retorna MenuMarcaDto (NomeMarca, MediaAvaliacoes, TotalAvaliacoes)
     availableBrands.value = response.data.filter(
-      (brand) => brand.nomeMarca.toLowerCase() !== 'atelievirtual',
+      (brand) => brand.nomeMarca.toLowerCase() !== 'badelukinha',
     )
   } catch (err) {
     console.error('Erro ao buscar marcas:', err)
@@ -163,7 +163,7 @@ const contactSeamstress = (costureira) => {
   const phone = costureira.telefoneWhatsApp?.replace(/\D/g, '')
   if (phone) {
     const text = encodeURIComponent(
-      `Olá, vi seu perfil no AtelieVirtual e gostaria de saber mais sobre seus serviços!`,
+      `Olá, vi seu perfil no Badelukinha e gostaria de saber mais sobre seus serviços!`,
     )
     window.open(`https://wa.me/55${phone}?text=${text}`, '_blank')
   } else {

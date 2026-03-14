@@ -46,7 +46,7 @@ mainStore.fetchSampleHistory()
 // }
 
 // Default title tag
-const defaultDocumentTitle = 'Ateliê Virtual'
+const defaultDocumentTitle = 'Badelukinha'
 
 // Set document title from route meta
 router.afterEach((to) => {

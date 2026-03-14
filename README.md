@@ -1,56 +1,54 @@
-# AtelieVirtual
+# Badelukinha - Catálogo de Moda Infantil
 
-Bem-vindo ao repositório do projeto AtelieVirtual!
+Bem-vindo ao repositório oficial do projeto **Badelukinha**, uma marca especializada em moda infantil que une conforto, estilo e diversão para os pequenos.
 
 ## Visão Geral do Projeto
 
-AtelieVirtual é uma plataforma gratuita desenvolvida para costureiras independentes que desejam expor suas peças online sem a necessidade de investir em um sistema de e-commerce próprio. A plataforma atua como uma vitrine virtual, conectando clientes interessados diretamente com as costureiras.
+O Badelukinha é uma vitrine virtual projetada para apresentar as coleções da marca de forma elegante e intuitiva. O objetivo principal é facilitar a visualização dos produtos e permitir que os clientes entrem em contato diretamente para solicitações de orçamentos e compras personalizadas.
 
-Este projeto não é um e-commerce com sistema de pagamento integrado, mas sim uma ponte para facilitar a comunicação e a apresentação dos produtos.
+Diferente de um e-commerce tradicional, esta plataforma foca na experiência de catálogo, utilizando o **WhatsApp** como o canal direto de fechamento de pedidos, garantindo um atendimento humano e personalizado.
 
-## Estrutura do Projeto
+## Principais Funcionalidades
 
-O projeto é composto por dois serviços principais: um backend em .NET 8 e um frontend em Vue.js 3.
+### Para os Clientes (Vitrine)
+- **Vitrine Virtual**: Exibição detalhada de produtos com imagens de alta qualidade e zoom interativo.
+- **Categorização Inteligente**: Filtros rápidos para navegar entre categorias como:
+    - Conjuntos Fleece
+    - Fantasias
+    - Vestidos
+    - Conjuntos Casuais
+- **Busca em Tempo Real**: Localização rápida de peças específicas por nome ou descrição.
+- **Solicitação via WhatsApp**: Integração direta que envia os detalhes do produto escolhido para o atendimento da marca com um único clique.
 
-### Backend (`api-atelievirtual`)
+### Administrativo
+- **Gestão de Catálogo**: Painel para cadastro, edição e organização de produtos.
+- **Dashboard de Insights**: Monitoramento de visualizações e cliques nos produtos para entender as preferências dos clientes.
 
-Uma API RESTful que lida com toda a lógica de negócio, acesso a dados e autenticação.
+## Estrutura Técnica
 
--   **Tecnologia**: .NET 8 / C#
--   **Arquitetura**: Padrões MVC, Repository e Unit of Work.
--   **Principais Componentes**:
-    -   `Controllers`: Gerenciam rotas e requisições/respostas.
-    -   `Services`: Contêm a lógica de negócio (ex: `AuthService`, `MegaService`).
-    -   `Repositories`: Abstração para acesso a dados, incluindo `UnitOfWork`.
-    -   `Models`: Entidades de domínio e DTOs (RequestModels).
-    -   `Data`: `AppDbContext` do Entity Framework.
--   **Banco de Dados**: PostgreSQL com Entity Framework Core.
--   **Autenticação**: JWT (JSON Web Tokens).
--   **Serviços Externos**: Integração com MEGA para upload de imagens.
+O ecossistema Badelukinha é construído com tecnologias modernas para garantir performance e escalabilidade.
 
-### Frontend (`front-atelievirtual`)
+### Frontend (`front-badelukinha`)
+Uma Single Page Application (SPA) moderna e responsiva.
+- **Tecnologia**: Vue.js 3
+- **Ferramenta de Build**: Vite
+- **Gerenciamento de Estado**: Pinia
+- **Estilização**: Tailwind CSS (com foco em uma paleta suave: laranja, rosa e amarelo).
+- **Interface**: Baseada no template Admin One, customizada para uma estética lúdica e infantil.
 
-Uma Single Page Application (SPA) que consome a API .NET.
+### Backend (`api-badelukinha`)
+API RESTful robusta que gerencia o catálogo e a lógica de negócio.
+- **Tecnologia**: .NET 8 / C#
+- **Banco de Dados**: PostgreSQL com Entity Framework Core.
+- **Autenticação**: JWT (JSON Web Tokens) para a área administrativa.
+- **Armazenamento**: Integração para upload e gestão de imagens de produtos.
 
--   **Tecnologia**: Vue.js 3
--   **Build Tool**: Vite
--   **Base**: Utiliza o template "Admin One Vue Tailwind" para a estrutura da interface, adaptado para as áreas pública e administrativa.
--   **Recursos Principais**:
-    -   **Roteamento**: `vue-router`, com rotas protegidas por autenticação.
-    -   **Gerenciamento de Estado**: `pinia` (com `auth.js` para autenticação).
-    -   **Estilização**: Tailwind CSS.
-    -   **Comunicação com API**: `axios` configurado em `src/services/api.js`.
+## Design e Identidade Visual
 
-## Padrões de Design (UI/UX)
-
-O design da vitrine virtual (`VitrineView`) é inspirado em `exemplo/pages/catalogo.js` e segue os seguintes padrões:
-
--   **Paleta de Cores**: Gradiente suave de fundo (`bg-gradient-to-b from-orange-50 via-pink-50 to-yellow-50`), com destaque em tons de vermelho e laranja.
--   **Layout**: Conteúdo centralizado com título principal e subtítulo.
--   **Filtros**: Utilização de `PillTag` para categorias, com destaque para o filtro ativo.
--   **Cards de Produto**: `CardBox` com `overflow-hidden`, `shadow-lg`, `hover:shadow-2xl`, borda tracejada (`border-2 border-red-200 border-dashed`). Imagens com zoom no hover.
--   **Botões de Ação (CTA)**: Botão "Solicitar Orçamento" com gradiente (`bg-gradient-to-r from-red-500 to-orange-500`), que abre o WhatsApp com mensagem automática e informações do produto.
+A interface do Badelukinha foi pensada para transmitir a alegria da marca:
+- **Cores**: Gradientes suaves (`from-orange-50` a `to-yellow-50`) com destaques vibrantes em vermelho e laranja.
+- **Componentes**: Cards de produtos com bordas tracejadas e sombras suaves, evocando um visual artesanal e cuidadoso.
 
 ---
 
-Este README.md fornece uma visão geral do projeto. Para detalhes específicos sobre a configuração e execução, consulte a documentação interna de cada módulo.
+Este projeto representa a transição da marca para o ambiente digital, oferecendo uma experiência de compra moderna e próxima do cliente.
