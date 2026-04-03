@@ -1,54 +1,47 @@
-# Badelukinha - Catálogo de Moda Infantil
+# Badelukinha - Catálogo Exclusivo de Moda Infantil
 
-Bem-vindo ao repositório oficial do projeto **Badelukinha**, uma marca especializada em moda infantil que une conforto, estilo e diversão para os pequenos.
+Bem-vindo ao repositório do frontend do **Ateliê Badelukinha**, uma marca especializada em moda infantil. O sistema foi transformado em uma vitrine exclusiva para apresentar as coleções da marca.
 
 ## Visão Geral do Projeto
 
-O Badelukinha é uma vitrine virtual projetada para apresentar as coleções da marca de forma elegante e intuitiva. O objetivo principal é facilitar a visualização dos produtos e permitir que os clientes entrem em contato diretamente para solicitações de orçamentos e compras personalizadas.
-
-Diferente de um e-commerce tradicional, esta plataforma foca na experiência de catálogo, utilizando o **WhatsApp** como o canal direto de fechamento de pedidos, garantindo um atendimento humano e personalizado.
+O Badelukinha é um catálogo virtual projetado para exibir produtos de forma elegante. O objetivo é facilitar a visualização das criações e permitir o contato direto via WhatsApp para orçamentos e compras.
 
 ## Principais Funcionalidades
 
-### Para os Clientes (Vitrine)
-- **Vitrine Virtual**: Exibição detalhada de produtos com imagens de alta qualidade e zoom interativo.
-- **Categorização Inteligente**: Filtros rápidos para navegar entre categorias como:
-    - Conjuntos Fleece
-    - Fantasias
-    - Vestidos
-    - Conjuntos Casuais
-- **Busca em Tempo Real**: Localização rápida de peças específicas por nome ou descrição.
-- **Solicitação via WhatsApp**: Integração direta que envia os detalhes do produto escolhido para o atendimento da marca com um único clique.
+### Catálogo (Público)
+- **Home Exclusiva**: Página inicial com o catálogo completo do ateliê.
+- **Visualização Detalhada**: Detalhes do produto com galeria de imagens e especificações.
+- **Categorização**: Filtros por categorias (Fleece, Fantasias, Vestidos, Casuais).
+- **Integração WhatsApp**: Botão direto para solicitar orçamentos via WhatsApp.
 
-### Administrativo
-- **Gestão de Catálogo**: Painel para cadastro, edição e organização de produtos.
-- **Dashboard de Insights**: Monitoramento de visualizações e cliques nos produtos para entender as preferências dos clientes.
+### Gestão (Administrativo)
+- **Dashboard de Performance**: Monitoramento de cliques e visualizações de produtos.
+- **Gestão de Produtos**: Cadastro, edição e exclusão de itens do catálogo.
+- **Perfil do Ateliê**: Edição de informações de contato, sobre e localização.
 
 ## Estrutura Técnica
 
-O ecossistema Badelukinha é construído com tecnologias modernas para garantir performance e escalabilidade.
+- **Tecnologia**: Vue.js 3 (Composition API)
+- **Build**: Vite
+- **Estado**: Pinia
+- **Estilo**: Tailwind CSS
+- **Layout**: Responsivo, otimizado para mobile e desktop.
 
-### Frontend (`front-badelukinha`)
-Uma Single Page Application (SPA) moderna e responsiva.
-- **Tecnologia**: Vue.js 3
-- **Ferramenta de Build**: Vite
-- **Gerenciamento de Estado**: Pinia
-- **Estilização**: Tailwind CSS (com foco em uma paleta suave: laranja, rosa e amarelo).
-- **Interface**: Baseada no template Admin One, customizada para uma estética lúdica e infantil.
+## Configuração
 
-### Backend (`api-badelukinha`)
-API RESTful robusta que gerencia o catálogo e a lógica de negócio.
-- **Tecnologia**: .NET 8 / C#
-- **Banco de Dados**: PostgreSQL com Entity Framework Core.
-- **Autenticação**: JWT (JSON Web Tokens) para a área administrativa.
-- **Armazenamento**: Integração para upload e gestão de imagens de produtos.
-
-## Design e Identidade Visual
-
-A interface do Badelukinha foi pensada para transmitir a alegria da marca:
-- **Cores**: Gradientes suaves (`from-orange-50` a `to-yellow-50`) com destaques vibrantes em vermelho e laranja.
-- **Componentes**: Cards de produtos com bordas tracejadas e sombras suaves, evocando um visual artesanal e cuidadoso.
+1. **Instale as dependências:**
+   ```bash
+   npm install
+   ```
+2. **Configure o `.env`:**
+   ```env
+   VITE_API_BASE_URL="http://localhost:5000/api"
+   VITE_GOOGLE_CLIENT_ID="..."
+   ```
+3. **Inicie o servidor de desenvolvimento:**
+   ```bash
+   npm run dev
+   ```
 
 ---
-
-Este projeto representa a transição da marca para o ambiente digital, oferecendo uma experiência de compra moderna e próxima do cliente.
+Catálogo desenvolvido para o **Ateliê Badelukinha**.

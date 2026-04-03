@@ -32,23 +32,7 @@ const profileForm = reactive({
   estado: '',
   latitude: null,
   longitude: null,
-  servicosIds: [],
 })
-
-const servicosDisponiveis = ref({})
-
-const fetchServicosDisponiveis = async () => {
-  try {
-    const { data } = await api.get('/Costureiras/servicos')
-    // Converte [{id, nome}] para {id: nome}
-    servicosDisponiveis.value = data.reduce((acc, curr) => {
-      acc[curr.id] = curr.nome
-      return acc
-    }, {})
-  } catch (error) {
-    console.error('Erro ao buscar serviços disponíveis:', error)
-  }
-}
 
 const fetchProfileData = async () => {
   try {
@@ -66,7 +50,6 @@ const fetchProfileData = async () => {
     profileForm.estado = data.estado || ''
     profileForm.latitude = data.latitude || null
     profileForm.longitude = data.longitude || null
-    profileForm.servicosIds = data.servicosIds || []
 
     // Atualiza o store se necessário para manter consistência
     authStore.updateUser(data)
@@ -76,7 +59,6 @@ const fetchProfileData = async () => {
 }
 
 onMounted(() => {
-  fetchServicosDisponiveis()
   fetchProfileData()
 })
 
@@ -168,8 +150,7 @@ const salvarPerfil = async () => {
       cidade: profileForm.cidade,
       estado: profileForm.estado,
       latitude: profileForm.latitude,
-      longitude: profileForm.longitude,
-      servicosIds: profileForm.servicosIds 
+      longitude: profileForm.longitude
     })
     notification.value = {
       show: true,
@@ -335,16 +316,6 @@ const salvarSenha = async () => {
               />
             </FormField>
           </div>
-
-          <BaseDivider />
-
-          <FormField label="Serviços Prestados" help="Selecione os tipos de serviços que você oferece">
-            <FormCheckRadioGroup
-              v-model="profileForm.servicosIds"
-              name="servicos"
-              :options="servicosDisponiveis"
-            />
-          </FormField>
 
           <template #footer>
             <BaseButtons>

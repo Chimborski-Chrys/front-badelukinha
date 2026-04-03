@@ -66,7 +66,7 @@ window.addEventListener('keydown', (e) => {
 
 <template>
   <OverlayLayer
-    v-if="modelValue"
+    v-if="modelValue && produto"
     @overlay-click="close"
     class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/50 p-4 backdrop-blur-sm"
   >
@@ -114,20 +114,6 @@ window.addEventListener('keydown', (e) => {
             <h2 class="mb-2 text-2xl leading-tight font-bold text-gray-800 md:text-3xl">
               {{ produto?.nome }}
             </h2>
-            <div class="flex items-center gap-1 text-sm text-gray-500">
-              <span>Criado por:</span>
-              <router-link
-                v-if="produto?.usuario?.nomeMarca"
-                :to="{ name: 'loja', params: { marca: produto.usuario.nomeMarca } }"
-                class="cursor-pointer font-bold text-indigo-600 transition-colors hover:text-indigo-800 hover:underline"
-                @click="close"
-              >
-                {{ produto?.usuario?.nomeMarca || produto?.usuario?.nome || 'Badelukinha' }}
-              </router-link>
-              <span v-else class="font-bold text-indigo-600">
-                {{ produto?.usuario?.nomeMarca || produto?.usuario?.nome || 'Badelukinha' }}
-              </span>
-            </div>
           </div>
 
           <div class="prose prose-sm mb-4 leading-relaxed text-gray-600">

@@ -46,7 +46,7 @@ const submit = async () => {
 
     // Redirecionamento condicional
     if (authStore.isSuperAdmin) {
-      router.push('/admin/dashboard') 
+      router.push('/dashboard') 
     } else if (authStore.isCostureira) {
       router.push('/dashboard') 
     } else {
@@ -71,7 +71,7 @@ const handleGoogleSuccess = async (response) => {
     authStore.setAuth(usuario, token)
     
     if (authStore.isSuperAdmin) {
-      router.push('/admin/dashboard')
+      router.push('/dashboard')
     } else if (authStore.isCostureira) {
       router.push('/dashboard')
     } else {
@@ -98,8 +98,8 @@ const handleGoogleError = () => {
     <SectionFullScreen v-slot="{ cardClass }" bg="slate">
       <CardBox :class="cardClass" is-form class="rounded-3xl shadow-2xl border-none" @submit.prevent="submit">
         <div class="text-center mb-8">
-          <h1 class="text-2xl font-black text-slate-800">Acesse sua conta</h1>
-          <p class="text-slate-500 text-sm mt-1">Gerencie seu ateliê e conecte-se com clientes.</p>
+          <h1 class="text-2xl font-black text-slate-800">Administração Badelukinha</h1>
+          <p class="text-slate-500 text-sm mt-1">Gerencie seus produtos e catálogo.</p>
         </div>
 
         <NotificationBar v-if="errorMessage" color="danger" :icon="mdiAlertCircle">

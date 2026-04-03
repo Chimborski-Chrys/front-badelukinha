@@ -123,7 +123,10 @@ const submitProduct = async () => {
     formData.append('nome', currentProduct.value.nome)
     formData.append('descricao', currentProduct.value.descricao)
     formData.append('categoria', currentProduct.value.categoria)
-    formData.append('precoMedio', parseFloat(currentProduct.value.precoMedio))
+    
+    // Converte o preço para string garantindo o ponto como separador decimal
+    const precoFormatado = Number(currentProduct.value.precoMedio).toFixed(2)
+    formData.append('precoMedio', precoFormatado)
 
     // Append cada tamanho individualmente para o backend receber como List<string>
     if (currentProduct.value.tamanhos && currentProduct.value.tamanhos.length > 0) {

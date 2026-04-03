@@ -25,14 +25,8 @@ export default [
     isNotAdmin: true,
   },
   {
-    to: '/admin/criar-costureira',
-    label: 'Criar Costureira',
-    icon: mdiAccountPlus,
-    isAdmin: true, // Apenas para administradores
-  },
-  {
     to: '/',
-    label: 'Vitrine',
+    label: 'Ver Catálogo',
     icon: mdiStore,
   },
 ]

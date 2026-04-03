@@ -1,19 +1,16 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue'
-import { useRoute } from 'vue-router'
 import LayoutGuest from '@/layouts/LayoutGuest.vue'
-import CardBox from '@/components/CardBox.vue'
 import CardBoxComponentEmpty from '@/components/CardBoxComponentEmpty.vue'
 import BaseButton from '@/components/BaseButton.vue'
-import PillTag from '@/components/PillTag.vue'
 import ProductModal from '@/components/ProductModal.vue'
-import FormControl from '@/components/FormControl.vue' // Importar FormControl
-import ReviewsSection from '@/components/ReviewsSection.vue' // Importar o novo componente de avaliações
+import FormControl from '@/components/FormControl.vue'
 import NotificationBar from '@/components/NotificationBar.vue'
+import BaseIcon from '@/components/BaseIcon.vue'
 import api from '@/services/api'
-import { mdiWhatsapp, mdiLayers, mdiTag, mdiStar, mdiTshirtCrew, mdiEye, mdiMagnify, mdiMapMarker, mdiArrowLeft } from '@mdi/js' // Adicionar mdiMagnify, mdiArrowLeft
+import { mdiWhatsapp, mdiLayers, mdiTag, mdiStar, mdiTshirtCrew, mdiEye, mdiMagnify, mdiMapMarker } from '@mdi/js'
 
-const route = useRoute()
+const MARCA_PADRAO = 'badelukinha'
 const costureira = ref(null)
 const isLoading = ref(true)
 const notification = ref({
@@ -22,8 +19,8 @@ const notification = ref({
   message: '',
 })
 
-const searchTermLoja = ref('') // Novo: Termo de busca para produtos da loja
-const lojaProdutos = ref([]) // Novo: Lista de produtos da loja
+const searchTermLoja = ref('')
+const lojaProdutos = ref([])
 
 // --- Modal State for Products ---
 const isProductModalOpen = ref(false)
@@ -46,20 +43,20 @@ const handleShowProductDetails = async (produto) => {
   }
 }
 
-const fetchCostureiraData = async (marca) => {
+const fetchCostureiraData = async () => {
   isLoading.value = true
   notification.value.show = false
   try {
-    // Busca apenas o perfil da costureira, sem os produtos aninhados
-    const response = await api.get(`/Costureiras/publico/marca/${marca}`)
+    const response = await api.get(`/Perfil/publico/marca/${MARCA_PADRAO}`)
     costureira.value = response.data
+    await fetchLojaProdutos()
   } catch (error) {
     console.error('Erro ao buscar dados da costureira:', error)
     costureira.value = null
     notification.value = {
       show: true,
       color: 'danger',
-      message: error.response?.data?.message || 'Erro ao carregar perfil da loja.',
+      message: 'Ateliê não encontrado. Certifique-se de que o perfil está configurado no banco de dados.',
     }
   } finally {
     isLoading.value = false
@@ -67,16 +64,12 @@ const fetchCostureiraData = async (marca) => {
 }
 
 const fetchLojaProdutos = async () => {
-  if (!costureira.value?.id) {
-    lojaProdutos.value = []
-    return
-  }
-
   try {
     const params = {
       searchTerm: searchTermLoja.value,
+      brand: MARCA_PADRAO
     }
-    const response = await api.get(`/Costureiras/${costureira.value.id}/produtos`, { params })
+    const response = await api.get('/Produtos/vitrine', { params })
     lojaProdutos.value = response.data
   } catch (error) {
     console.error('Erro ao buscar produtos da loja:', error)
@@ -93,7 +86,6 @@ const categoryMap = {
   'conjunto-casual': { label: 'Conjuntos Casuais', icon: mdiTshirtCrew },
 }
 
-// --- Methods ---
 const getCategoryLabel = (categoryKey) => {
   if (!categoryKey) return 'Geral'
   if (categoryMap[categoryKey]) {
@@ -102,19 +94,10 @@ const getCategoryLabel = (categoryKey) => {
   return categoryKey.charAt(0).toUpperCase() + categoryKey.slice(1)
 }
 
-// Observa mudanças no parâmetro 'marca' da rota e recarrega os dados
-watch(
-  () => route.params.marca,
-  async (newMarca) => {
-    if (newMarca) {
-      await fetchCostureiraData(newMarca)
-      await fetchLojaProdutos() // Carrega os produtos da loja com o searchTermLoja atual (que pode ser vazio)
-    }
-  },
-  { immediate: true },
-)
+onMounted(() => {
+  fetchCostureiraData()
+})
 
-// Observa mudanças no searchTermLoja para recarregar os produtos
 watch(searchTermLoja, () => {
   fetchLojaProdutos()
 })
@@ -138,28 +121,13 @@ watch(searchTermLoja, () => {
 
       <div v-else-if="!costureira" class="max-w-2xl mx-auto text-center py-20 bg-white rounded-3xl shadow-sm border border-slate-100">
         <BaseIcon :path="mdiTshirtCrew" size="64" class="mx-auto mb-6 text-slate-200" />
-        <h2 class="text-2xl font-bold text-slate-800 mb-2">Ateliê não encontrado</h2>
-        <p class="text-slate-500 mb-8">Este perfil pode ter sido removido ou o link está incorreto.</p>
-        <BaseButton to="/" label="Voltar para a vitrine" color="info" outline />
+        <h2 class="text-2xl font-bold text-slate-800 mb-2">Bem-vindo(a)!</h2>
+        <p class="text-slate-500 mb-8">O catálogo está sendo configurado.</p>
       </div>
 
       <div v-else class="container mx-auto">
-        <!-- Botão Voltar para a Vitrine -->
-        <div class="mb-6 flex justify-start">
-          <BaseButton
-            to="/"
-            :icon="mdiArrowLeft"
-            label="Voltar para a Vitrine"
-            color="white"
-            class="text-slate-600 hover:text-indigo-600 transition-colors shadow-sm"
-            rounded-full
-            small
-          />
-        </div>
-
-        <!-- Header da Loja: Estilo Editorial -->
+        <!-- Header da Loja -->
         <div class="mb-16 bg-white rounded-3xl p-8 md:p-12 shadow-sm border border-slate-100 relative overflow-hidden">
-          <!-- Decoração sutil de fundo -->
           <div class="absolute top-0 right-0 w-64 h-64 bg-slate-50 rounded-full -mr-32 -mt-32 z-0"></div>
           
           <div class="relative z-10 flex flex-col md:flex-row items-center md:items-start gap-8">
@@ -217,16 +185,16 @@ watch(searchTermLoja, () => {
           </div>
         </div>
 
-        <!-- Produtos da Loja -->
+        <!-- Produtos -->
         <div class="space-y-10">
           <div class="flex flex-col md:flex-row items-center justify-between gap-6 border-b border-slate-200 pb-8">
-            <h2 class="text-2xl font-bold text-slate-800">Criações e Amostras</h2>
+            <h2 class="text-2xl font-bold text-slate-800">Minhas Criações</h2>
             
             <div class="flex items-center gap-3 w-full md:w-auto">
               <FormControl
                 v-model="searchTermLoja"
                 :icon="mdiMagnify"
-                placeholder="Buscar no ateliê..."
+                placeholder="Buscar no catálogo..."
                 class="w-full md:w-64"
                 @keyup.enter="fetchLojaProdutos"
               />
@@ -274,17 +242,11 @@ watch(searchTermLoja, () => {
           
           <div v-else class="text-center py-20 bg-slate-50 rounded-3xl border-2 border-dashed border-slate-200">
             <BaseIcon :path="mdiTag" size="48" class="mx-auto mb-4 text-slate-200" />
-            <p class="text-slate-500 font-medium">Nenhuma peça encontrada neste ateliê.</p>
+            <p class="text-slate-500 font-medium">Nenhuma peça encontrada no catálogo.</p>
           </div>
-        </div>
-
-        <!-- Avaliações dos Clientes -->
-        <div v-if="costureira" class="mt-20 border-t border-slate-100 pt-16">
-          <ReviewsSection :costureira-id="costureira.id" />
         </div>
       </div>
     </div>
-    <!-- Product Modal -->
     <ProductModal v-model="isProductModalOpen" :produto="selectedProductInModal" />
   </LayoutGuest>
 </template>
