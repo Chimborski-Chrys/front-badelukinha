@@ -1,8 +1,8 @@
-﻿import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 
 const routes = [
-  // --- ROTAS PÃšBLICAS ---
+  // --- ROTAS PÚBLICAS ---
   {
     meta: {
       title: 'Catálogo Badelukinha',
@@ -26,13 +26,13 @@ const routes = [
       title: 'Dashboard',
       requiresAuth: true,
     },
-    path: '/dashboard',
+    path: '/admin/dashboard',
     name: 'dashboard',
     component: () => import('@/views/DashboardView.vue'),
   },
   {
     meta: {
-      title: 'Profile',
+      title: 'Perfil',
       requiresAuth: true,
     },
     path: '/admin/profile',
@@ -58,6 +58,11 @@ const routes = [
     name: 'error',
     component: () => import('@/views/ErrorView.vue'),
   },
+  // Redirecionamento de legado para o novo padrão admin
+  {
+    path: '/dashboard',
+    redirect: '/admin/dashboard'
+  }
 ]
 
 const router = createRouter({

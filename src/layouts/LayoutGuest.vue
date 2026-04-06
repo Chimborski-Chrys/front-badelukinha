@@ -13,11 +13,7 @@ const isAuthenticated = computed(() => authStore.isAuthenticated)
 
 const handleAuthAreaClick = () => {
   if (isAuthenticated.value) {
-    if (authStore.isSuperAdmin) {
-      router.push('/admin/dashboard')
-    } else {
-      router.push('/dashboard') // Dashboard da Costureira
-    }
+    router.push('/admin/dashboard')
   } else {
     router.push('/login')
   }

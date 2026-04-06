@@ -1,67 +1,26 @@
-﻿<script setup>
-import { reactive, ref } from 'vue'
+<script setup>
+import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { mdiAccount, mdiAsterisk, mdiAlertCircle } from '@mdi/js'
+import { mdiAlertCircle, mdiGoogle } from '@mdi/js'
 import SectionFullScreen from '@/components/SectionFullScreen.vue'
 import CardBox from '@/components/CardBox.vue'
-import FormCheckRadio from '@/components/FormCheckRadio.vue'
-import FormField from '@/components/FormField.vue'
-import FormControl from '@/components/FormControl.vue'
 import BaseButton from '@/components/BaseButton.vue'
-import BaseButtons from '@/components/BaseButtons.vue'
 import LayoutGuest from '@/layouts/LayoutGuest.vue'
 import NotificationBar from '@/components/NotificationBar.vue'
 import { useAuthStore } from '@/stores/auth'
 import api from '@/services/api'
 import { GoogleSignInButton } from 'vue3-google-signin'
 
-const form = reactive({
-  email: 'costureira1@email.com', // Valor de exemplo
-  senha: 'password123', // Valor de exemplo
-  remember: true,
-})
-
 const router = useRouter()
 const authStore = useAuthStore()
 
 const errorMessage = ref(null)
-
-const submit = async () => {
-  errorMessage.value = null // Limpa erros anteriores
-  try {
-    const response = await api.post('/Auth/login', {
-      email: form.email,
-      senha: form.senha,
-    })
-
-    const { token, usuario } = response.data
-
-    if (!usuario.ativo) {
-      errorMessage.value = 'Usuário inativo. Por favor, entre em contato com o suporte.'
-      authStore.clearAuth()
-      return
-    }
-
-    authStore.setAuth(usuario, token)
-
-    // Redirecionamento condicional
-    if (authStore.isSuperAdmin) {
-      router.push('/dashboard') 
-    } else if (authStore.isCostureira) {
-      router.push('/dashboard') 
-    } else {
-      router.push('/') // Clientes vão para a Vitrine
-    }
-  } catch (error) {
-    console.error('Falha no login:', error)
-    errorMessage.value = 'Email ou senha invÃ¡lidos. Por favor, tente novamente.'
-    authStore.clearAuth() // Garante que qualquer estado de auth antigo seja limpo
-  }
-}
+const isLoading = ref(false)
 
 const handleGoogleSuccess = async (response) => {
   const { credential } = response
   errorMessage.value = null
+  isLoading.value = true
   try {
     const apiResponse = await api.post('/Auth/google', {
       idToken: credential
@@ -70,10 +29,8 @@ const handleGoogleSuccess = async (response) => {
     const { token, usuario } = apiResponse.data
     authStore.setAuth(usuario, token)
     
-    if (authStore.isSuperAdmin) {
-      router.push('/dashboard')
-    } else if (authStore.isCostureira) {
-      router.push('/dashboard')
+    if (authStore.isSuperAdmin || authStore.isCostureira) {
+      router.push('/admin/dashboard')
     } else {
       router.push('/')
     }
@@ -82,80 +39,65 @@ const handleGoogleSuccess = async (response) => {
     if (error.response && error.response.status === 403) {
       errorMessage.value = error.response.data.message || 'Sua conta aguarda ativação por um administrador.'
     } else {
-      errorMessage.value = 'Falha ao autenticar com Google. Tente novamente.'
+      errorMessage.value = 'Falha ao autenticar com Google. Verifique se você tem permissão de acesso.'
     }
     authStore.clearAuth()
+  } finally {
+    isLoading.value = false
   }
 }
 
 const handleGoogleError = () => {
-  errorMessage.value = 'Erro ao conectar com Google.'
+  errorMessage.value = 'Erro ao conectar com Google. Tente novamente mais tarde.'
 }
 </script>
 
 <template>
   <LayoutGuest>
     <SectionFullScreen v-slot="{ cardClass }" bg="slate">
-      <CardBox :class="cardClass" is-form class="rounded-3xl shadow-2xl border-none" @submit.prevent="submit">
-        <div class="text-center mb-8">
-          <h1 class="text-2xl font-black text-slate-800">Administração Badelukinha</h1>
-          <p class="text-slate-500 text-sm mt-1">Gerencie seus produtos e catálogo.</p>
+      <CardBox :class="cardClass" class="rounded-3xl shadow-2xl border-none p-10">
+        <div class="text-center mb-10">
+          <h1 class="text-3xl font-black text-slate-800">Badelukinha</h1>
+          <p class="text-slate-500 text-sm mt-2 font-medium">Painel Administrativo</p>
         </div>
 
-        <NotificationBar v-if="errorMessage" color="danger" :icon="mdiAlertCircle">
+        <NotificationBar v-if="errorMessage" color="danger" :icon="mdiAlertCircle" class="mb-6">
           {{ errorMessage }}
         </NotificationBar>
 
-        <FormField label="Email" help="Por favor, insira seu email">
-          <FormControl
-            v-model="form.email"
-            :icon="mdiAccount"
-            name="login"
-            autocomplete="username"
-          />
-        </FormField>
+        <div class="flex flex-col items-center justify-center space-y-8 py-6">
+          <div class="bg-indigo-50 p-6 rounded-full mb-2">
+            <svg class="w-12 h-12 text-indigo-600" viewBox="0 0 24 24">
+              <path fill="currentColor" :d="mdiGoogle" />
+            </svg>
+          </div>
+          
+          <div class="text-center">
+            <h2 class="text-xl font-bold text-slate-700">Acesso Restrito</h2>
+            <p class="text-slate-400 text-sm mt-1">Utilize sua conta Google para entrar</p>
+          </div>
 
-        <FormField label="Senha" help="Por favor, insira sua senha">
-          <FormControl
-            v-model="form.senha"
-            :icon="mdiAsterisk"
-            type="password"
-            name="password"
-            autocomplete="current-password"
-          />
-        </FormField>
+          <div v-if="isLoading" class="flex flex-col items-center">
+            <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-600"></div>
+            <p class="mt-4 text-sm text-slate-500 font-medium">Autenticando...</p>
+          </div>
 
-        <FormCheckRadio
-          v-model="form.remember"
-          name="remember"
-          label="Lembrar-me"
-          :input-value="true"
-        />
+          <div v-else class="transform scale-110 hover:scale-115 transition-transform duration-300">
+            <GoogleSignInButton
+              type="standard"
+              theme="filled_blue"
+              size="large"
+              text="signin_with"
+              shape="pill"
+              @success="handleGoogleSuccess"
+              @error="handleGoogleError"
+            />
+          </div>
+        </div>
 
         <template #footer>
-          <div class="flex flex-col space-y-4 w-full">
-            <BaseButtons>
-              <BaseButton type="submit" color="info" label="Login" />
-              <BaseButton to="/" color="info" outline label="Voltar" />
-            </BaseButtons>
-
-            <div class="flex items-center justify-center w-full">
-              <div class="border-t border-gray-300 flex-grow mr-3"></div>
-              <span class="text-gray-500 text-xs font-semibold">OU</span>
-              <div class="border-t border-gray-300 flex-grow ml-3"></div>
-            </div>
-
-            <div class="flex justify-center">
-              <GoogleSignInButton
-                type="standard"
-                theme="outline"
-                size="large"
-                text="signin_with"
-                shape="rectangular"
-                @success="handleGoogleSuccess"
-                @error="handleGoogleError"
-              />
-            </div>
+          <div class="flex justify-center mt-6">
+            <BaseButton to="/" color="info" outline label="Voltar para a Vitrine" class="border-none hover:bg-slate-100" />
           </div>
         </template>
       </CardBox>
