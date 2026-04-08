@@ -7,6 +7,7 @@ import ProductModal from '@/components/ProductModal.vue'
 import FormControl from '@/components/FormControl.vue'
 import NotificationBar from '@/components/NotificationBar.vue'
 import BaseIcon from '@/components/BaseIcon.vue'
+import FooterBar from '@/components/FooterBar.vue'
 import api from '@/services/api'
 import { mdiWhatsapp, mdiLayers, mdiTag, mdiStar, mdiTshirtCrew, mdiEye, mdiMagnify, mdiMapMarker } from '@mdi/js'
 
@@ -187,11 +188,8 @@ watch(searchTermLoja, () => {
 
         <!-- Produtos -->
         <div class="space-y-10">
-          <div class="flex flex-col md:flex-row items-center justify-between gap-6 border-b border-slate-200 pb-8">
-            <h2 class="text-2xl font-bold text-slate-800">Minhas Criações</h2>
-            
-            <div class="flex items-center gap-3 w-full md:w-auto">
-              <FormControl
+          <div class="flex flex-col md:flex-row items-center justify-end gap-6 border-b border-slate-200 pb-8">
+            <div class="flex items-center gap-3 w-full md:w-auto">              <FormControl
                 v-model="searchTermLoja"
                 :icon="mdiMagnify"
                 placeholder="Buscar no catálogo..."
@@ -247,6 +245,7 @@ watch(searchTermLoja, () => {
         </div>
       </div>
     </div>
+    <FooterBar />
     <ProductModal v-model="isProductModalOpen" :produto="selectedProductInModal" />
   </LayoutGuest>
 </template>
