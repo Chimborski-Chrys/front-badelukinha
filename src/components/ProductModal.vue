@@ -2,7 +2,6 @@
 import { computed } from 'vue'
 import { mdiWhatsapp, mdiClose, mdiTag } from '@mdi/js'
 import BaseButton from '@/components/BaseButton.vue'
-import CardBox from '@/components/CardBox.vue'
 import OverlayLayer from '@/components/OverlayLayer.vue'
 import PillTag from '@/components/PillTag.vue'
 import api from '@/services/api.js'
@@ -41,7 +40,7 @@ const whatsappUrl = computed(() => {
 const registerWhatsappClick = async () => {
   if (!props.produto) return
 
-  // Verifica se jÃ¡ registrou clique no WhatsApp deste produto nesta sessÃ£o
+  // Verifica se já registrou clique no WhatsApp deste produto nesta sessão
   const sessionKey = `whatsapp_click_${props.produto.id}`
 
   if (!sessionStorage.getItem(sessionKey)) {
@@ -54,6 +53,23 @@ const registerWhatsappClick = async () => {
   }
 
   emit('contact')
+}
+
+// Category Mapping (Consistent with HomeView)
+const categoryMap = {
+  todos: { label: 'Todos' },
+  'conjunto-fleece': { label: 'Conjuntos Fleece' },
+  fantasia: { label: 'Fantasias' },
+  vestido: { label: 'Vestidos' },
+  'conjunto-casual': { label: 'Conjuntos Casuais' },
+}
+
+const getCategoryLabel = (categoryKey) => {
+  if (!categoryKey) return 'Geral'
+  if (categoryMap[categoryKey]) {
+    return categoryMap[categoryKey].label
+  }
+  return categoryKey.charAt(0).toUpperCase() + categoryKey.slice(1)
 }
 
 // Fecha com ESC
@@ -72,7 +88,7 @@ window.addEventListener('keydown', (e) => {
   >
     <!-- Modal Container -->
     <div
-      class="animate-fade-in-up relative flex max-h-[90vh] w-full max-w-4xl flex-col overflow-hidden rounded-xl bg-white shadow-2xl md:flex-row"
+      class="animate-fade-in-up relative flex max-h-[95vh] w-full max-w-4xl flex-col overflow-hidden rounded-xl bg-white shadow-2xl md:max-h-[90vh] md:flex-row"
       @click.stop
     >
       <!-- Close Button (Absolute, High Z-Index) -->
@@ -86,26 +102,26 @@ window.addEventListener('keydown', (e) => {
         </svg>
       </button>
 
-      <!-- Image Column (Scrollable on mobile if needed, or fixed height) -->
+      <!-- Image Column -->
       <div
-        class="relative flex min-h-[250px] w-full items-center justify-center bg-gray-100 md:h-auto md:w-5/12"
+        class="relative flex h-64 w-full shrink-0 items-center justify-center bg-gray-100 sm:h-80 md:h-auto md:w-5/12"
       >
         <img
           :src="produto?.imagemUrl || 'https://via.placeholder.com/600'"
           :alt="produto?.nome"
-          class="absolute inset-0 h-full w-full object-cover md:relative"
+          class="absolute inset-0 h-full w-full object-cover"
         />
       </div>
 
       <!-- Content Column -->
-      <div class="relative z-10 flex h-full w-full flex-col bg-white md:w-7/12">
+      <div class="relative z-10 flex min-h-0 w-full flex-1 flex-col bg-white md:w-7/12">
         <!-- Scrollable Content Area -->
         <div class="custom-scrollbar flex-grow overflow-y-auto p-6 md:p-8">
           <div class="mb-4 pr-8">
             <!-- Padding right for close button space on mobile -->
             <PillTag
               v-if="produto?.categoria"
-              :label="produto.categoria"
+              :label="getCategoryLabel(produto.categoria)"
               :icon="mdiTag"
               color="info"
               small
@@ -189,23 +205,6 @@ window.addEventListener('keydown', (e) => {
   to {
     opacity: 1;
     transform: translateY(0) scale(1);
-  }
-}
-</style>
-
-<style scoped>
-.animate-fade-in-up {
-  animation: fadeInUp 0.3s ease-out;
-}
-
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
   }
 }
 </style>

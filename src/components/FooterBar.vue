@@ -16,7 +16,7 @@ const year = new Date().getFullYear()
       <div
         class="flex flex-col items-end text-[10px] font-black tracking-widest text-slate-400 uppercase md:py-2"
       >
-        <span class="mt-1 opacity-70">Desenvolvido por rysdigital</span>
+        <a href="https://v0-rystech.vercel.app/" target="_blank" class="mt-1 opacity-70 hover:text-indigo-600 transition-colors">Desenvolvido por rystech</a>
       </div>
     </BaseLevel>
   </footer>
