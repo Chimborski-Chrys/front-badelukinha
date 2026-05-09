@@ -5,7 +5,6 @@ const routes = [
   // --- ROTAS PÚBLICAS ---
   {
     meta: {
-      title: 'Catálogo Badelukinha',
     },
     path: '/',
     name: 'home',

@@ -88,23 +88,23 @@ window.addEventListener('keydown', (e) => {
   >
     <!-- Modal Container -->
     <div
-      class="animate-fade-in-up relative flex max-h-[95vh] w-full max-w-4xl flex-col overflow-hidden rounded-xl bg-white shadow-2xl md:max-h-[90vh] md:flex-row"
+      class="animate-fade-in-up relative flex max-h-[96vh] w-full max-w-4xl flex-col overflow-hidden rounded-xl bg-white shadow-2xl md:h-auto md:max-h-[90vh] md:flex-row"
       @click.stop
     >
-      <!-- Close Button (Absolute, High Z-Index) -->
+      <!-- Close Button -->
       <button
         @click="close"
-        class="absolute top-3 right-3 z-50 rounded-full bg-black/20 p-2 text-white shadow-sm backdrop-blur-md transition-colors hover:bg-black/40"
+        class="absolute top-2 right-2 z-50 rounded-full bg-black/20 p-2 text-white shadow-sm backdrop-blur-md transition-colors hover:bg-black/40"
         title="Fechar"
       >
-        <svg style="width: 24px; height: 24px" viewBox="0 0 24 24">
+        <svg style="width: 20px; height: 20px" viewBox="0 0 24 24">
           <path fill="currentColor" :d="mdiClose" />
         </svg>
       </button>
 
       <!-- Image Column -->
       <div
-        class="relative flex h-64 w-full shrink-0 items-center justify-center bg-gray-100 sm:h-80 md:h-auto md:w-5/12"
+        class="relative flex min-h-[250px] w-full shrink-0 items-center justify-center bg-gray-100 sm:min-h-[300px] md:h-auto md:w-5/12"
       >
         <img
           :src="produto?.imagemUrl || 'https://via.placeholder.com/600'"
@@ -114,52 +114,42 @@ window.addEventListener('keydown', (e) => {
       </div>
 
       <!-- Content Column -->
-      <div class="relative z-10 flex min-h-0 w-full flex-1 flex-col bg-white md:w-7/12">
+      <div class="relative z-10 flex min-h-0 w-full flex-col bg-white md:w-7/12">
         <!-- Scrollable Content Area -->
-        <div class="custom-scrollbar flex-grow overflow-y-auto p-6 md:p-8">
-          <div class="mb-4 pr-8">
-            <!-- Padding right for close button space on mobile -->
-            <PillTag
-              v-if="produto?.categoria"
-              :label="getCategoryLabel(produto.categoria)"
-              :icon="mdiTag"
-              color="info"
-              small
-              class="mb-3"
-            />
-            <h2 class="mb-2 text-2xl leading-tight font-bold text-gray-800 md:text-3xl">
+        <div class="custom-scrollbar overflow-y-auto p-5 md:p-8">
+          <div class="mb-3">
+            <h2 class="text-xl leading-tight font-bold text-gray-800 md:text-3xl">
               {{ produto?.nome }}
             </h2>
           </div>
 
           <div class="prose prose-sm mb-4 leading-relaxed text-gray-600">
-            <h3 class="mb-2 text-xs font-bold tracking-wide text-gray-400 uppercase">Descrição</h3>
-            <p class="whitespace-pre-line">{{ produto?.descricao }}</p>
+            <h3 class="mb-1 text-[10px] font-bold tracking-wide text-gray-400 uppercase">Descrição</h3>
+            <p class="whitespace-pre-line text-sm">{{ produto?.descricao }}</p>
           </div>
 
-          <div v-if="produto?.tamanhos?.length > 0" class="mb-4">
-            <h3 class="mb-2 text-xs font-bold tracking-wide text-gray-400 uppercase">Tamanhos Disponíveis</h3>
-            <div class="flex flex-wrap gap-2">
-              <PillTag
+          <div v-if="produto?.tamanhos?.length > 0" class="mb-2">
+            <h3 class="mb-1 text-[10px] font-bold tracking-wide text-gray-400 uppercase">Tamanhos</h3>
+            <div class="flex flex-wrap gap-1">
+              <span
                 v-for="tamanho in produto.tamanhos"
                 :key="tamanho"
-                :label="tamanho"
-                color="info"
-                outline
-                small
-              />
+                class="rounded border border-indigo-100 bg-indigo-50 px-2 py-0.5 text-[10px] font-bold text-indigo-700"
+              >
+                {{ tamanho }}
+              </span>
             </div>
           </div>
         </div>
 
         <!-- Fixed Footer Area -->
         <div class="mt-auto border-t border-gray-100 bg-gray-50 p-4 md:p-6">
-          <div class="flex flex-col items-center justify-between gap-4 sm:flex-row">
-            <div v-if="produto?.precoMedio > 0" class="w-full text-center sm:w-auto sm:text-left">
-              <p class="text-[10px] font-bold tracking-wider text-gray-500 uppercase">
+          <div class="flex flex-col items-center justify-between gap-3 sm:flex-row">
+            <div v-if="produto?.precoMedio > 0" class="flex w-full items-baseline justify-center gap-2 sm:w-auto sm:flex-col sm:items-start sm:gap-0">
+              <p class="text-[9px] font-bold tracking-wider text-gray-400 uppercase">
                 A partir de
               </p>
-              <span class="text-2xl font-bold text-slate-900">{{ formattedPrice }}</span>
+              <span class="text-xl font-black text-slate-900 md:text-2xl">{{ formattedPrice }}</span>
             </div>
 
             <BaseButton
@@ -168,7 +158,7 @@ window.addEventListener('keydown', (e) => {
               :icon="mdiWhatsapp"
               label="Solicitar Orçamento"
               color="success"
-              class="w-full flex-1 rounded-lg px-6 py-3 font-bold shadow transition-all hover:shadow-lg sm:w-auto"
+              class="w-full rounded-lg py-2.5 font-bold shadow-md sm:w-auto sm:flex-1 sm:px-6"
               @click="registerWhatsappClick"
             />
           </div>

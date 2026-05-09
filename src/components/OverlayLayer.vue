@@ -20,7 +20,7 @@ const overlayClick = (event) => {
 <template>
   <div
     :class="[type, zIndex]"
-    class="fixed inset-0 flex-col items-center justify-center overflow-hidden"
+    class="fixed inset-0 flex-col items-center justify-center"
   >
     <div
       class="overlay absolute inset-0 animate-overlay-fade-in bg-linear-to-tr opacity-90 dark:from-gray-700 dark:via-gray-900 dark:to-gray-700"
